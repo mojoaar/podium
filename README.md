@@ -2,6 +2,20 @@
 
 A lightweight Go web application for hosting your website with blog posts and static pages, all written in Markdown.
 
+## Screenshots
+
+![Podium Home Page](podium_1.png)
+_Clean, responsive design with dark/light theme toggle_
+
+![Blog Posts List](podium_2.png)
+_Blog posts with excerpts, tags, and reading time estimates_
+
+![Individual Post](podium_3.png)
+_Individual blog post with syntax highlighting and share buttons_
+
+![Mobile View](podium_4.png)
+_Mobile-responsive design with touch-friendly navigation_
+
 ## Features
 
 - 🚀 Built with Go and the Gin web framework
