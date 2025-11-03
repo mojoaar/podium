@@ -27,6 +27,7 @@ type Config struct {
 	SiteDescription string `yaml:"site_description"`
 	SiteAuthor      string `yaml:"site_author"`
 	SiteURL         string `yaml:"site_url"`
+	HomeIntro       string `yaml:"home_intro"`
 	Port            int    `yaml:"port"`
 	PostsFolder     string `yaml:"posts_folder"`
 	StaticFolder    string `yaml:"static_folder"`
@@ -113,6 +114,7 @@ func (p *program) run() {
 			"SiteTitle":   appConfig.SiteTitle,
 			"SiteDesc":    appConfig.SiteDescription,
 			"SiteAuthor":  appConfig.SiteAuthor,
+			"HomeIntro":   appConfig.HomeIntro,
 		})
 	})
 
