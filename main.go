@@ -28,6 +28,7 @@ type Config struct {
 	SiteAuthor      string `yaml:"site_author"`
 	SiteURL         string `yaml:"site_url"`
 	HomeIntro       string `yaml:"home_intro"`
+	ShowQuickLinks  bool   `yaml:"show_quick_links"`
 	Port            int    `yaml:"port"`
 	PostsFolder     string `yaml:"posts_folder"`
 	StaticFolder    string `yaml:"static_folder"`
@@ -110,11 +111,12 @@ func (p *program) run() {
 	p.router.GET("/", func(c *gin.Context) {
 		pages := getStaticPages()
 		c.HTML(http.StatusOK, "index.html", gin.H{
-			"Pages":       pages,
-			"SiteTitle":   appConfig.SiteTitle,
-			"SiteDesc":    appConfig.SiteDescription,
-			"SiteAuthor":  appConfig.SiteAuthor,
-			"HomeIntro":   appConfig.HomeIntro,
+			"Pages":          pages,
+			"SiteTitle":      appConfig.SiteTitle,
+			"SiteDesc":       appConfig.SiteDescription,
+			"SiteAuthor":     appConfig.SiteAuthor,
+			"HomeIntro":      appConfig.HomeIntro,
+			"ShowQuickLinks": appConfig.ShowQuickLinks,
 		})
 	})
 

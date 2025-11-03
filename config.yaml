@@ -6,6 +6,7 @@ site_description: "A simple and elegant blogging platform"
 site_author: "Morten Johansen"
 site_url: "http://localhost:8080"
 home_intro: "Podium is a lightweight web application built with Go and the Gin framework. It supports markdown-based blog posts and static pages that automatically appear in the navigation when added."
+show_quick_links: true
 
 # Server Settings
 port: 8080
