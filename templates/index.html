@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{.SiteTitle}} - Home</title>
+    <meta name="description" content="{{.SiteDesc}}" />
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="{{.SiteTitle}} RSS Feed"
+      href="/feed.xml"
+    />
+    <link rel="stylesheet" href="/assets/style.css" />
+  </head>
+  <body>
+    <header>
+      <nav>
+        <h1><a href="/">{{.SiteTitle}}</a></h1>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/posts">Blog Posts</a></li>
+          {{range .Pages}}
+          <li><a href="/page/{{.Slug}}">{{.Title}}</a></li>
+          {{end}}
+          <li>
+            <button class="theme-toggle" id="theme-toggle">🌙 Dark</button>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <div class="hero">
+        <h1>Welcome to {{.SiteTitle}}</h1>
+        <p>{{.SiteDesc}}</p>
+      </div>
+
+      <div class="content">
+        <section>
+          <h2>About</h2>
+          <p>
+            {{.SiteTitle}} is a lightweight web application built with Go and
+            the Gin framework. It supports markdown-based blog posts and static
+            pages that automatically appear in the navigation when added.
+          </p>
+        </section>
+
+        <section>
+          <h2>Quick Links</h2>
+          <ul class="quick-links">
+            <li><a href="/posts">View All Blog Posts</a></li>
+            {{range .Pages}}
+            <li><a href="/page/{{.Slug}}">{{.Title}}</a></li>
+            {{end}}
+          </ul>
+        </section>
+      </div>
+    </main>
+
+    <footer>
+      <p>
+        &copy; 2025
+        <a
+          href="https://github.com/mojoaar/podium"
+          target="_blank"
+          rel="noopener"
+          >{{.SiteTitle}}</a
+        >{{if .SiteAuthor}} by {{.SiteAuthor}}{{end}}. Built with Go and Gin ♥
+      </p>
+    </footer>
+
+    <script src="/assets/theme-toggle.js"></script>
+  </body>
+</html>

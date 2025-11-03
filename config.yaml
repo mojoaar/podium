@@ -1,0 +1,25 @@
+# Podium Configuration File
+
+# Site Settings
+site_title: "Podium"
+site_description: "A simple and elegant blogging platform"
+site_author: "Morten Johansen"
+site_url: "http://localhost:8080"
+
+# Server Settings
+port: 8080
+
+# Pagination
+posts_per_page: 10
+
+# RSS Feed
+feed_items: 20
+
+# Excerpts
+excerpt_length: 200
+
+# Paths (relative to application root)
+posts_folder: "posts"
+static_folder: "static"
+templates_folder: "templates"
+assets_folder: "assets"

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blog Posts - {{.SiteTitle}}</title>
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="{{.SiteTitle}} RSS Feed"
+      href="/feed.xml"
+    />
+    <link rel="stylesheet" href="/assets/style.css" />
+  </head>
+  <body>
+    <header>
+      <nav>
+        <h1><a href="/">{{.SiteTitle}}</a></h1>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/posts">Blog Posts</a></li>
+          {{range .Pages}}
+          <li><a href="/page/{{.Slug}}">{{.Title}}</a></li>
+          {{end}}
+          <li>
+            <button class="theme-toggle" id="theme-toggle">🌙 Dark</button>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <div class="content">
+        <h1>Blog Posts{{if .Tag}} - Tag: {{.Tag}}{{end}}</h1>
+
+        {{if .Posts}}
+        <div class="posts-list">
+          {{range .Posts}}
+          <article class="post-preview">
+            <h2><a href="/posts/{{.Slug}}">{{.Title}}</a></h2>
+            {{if .Date}}
+            <p class="post-date">
+              📅 {{.Date}}{{if .ReadingTime}} • ⏱️ {{.ReadingTime}}{{end}}
+            </p>
+            {{end}} {{if .Excerpt}}
+            <p class="post-excerpt">{{.Excerpt}}</p>
+            {{end}} {{if .Tags}}
+            <div class="tags-list">
+              {{range .Tags}}
+              <a href="/tags/{{.}}" class="tag">{{.}}</a>
+              {{end}}
+            </div>
+            {{end}}
+            <a href="/posts/{{.Slug}}" class="read-more">Read more →</a>
+          </article>
+          {{end}}
+        </div>
+
+        {{if .TotalPages}} {{if gt .TotalPages 1}}
+        <div class="pagination">
+          {{if .HasPrev}}
+          <a
+            href="?page={{.PrevPage}}{{if .Tag}}&tag={{.Tag}}{{end}}"
+            class="pagination-btn"
+            >← Previous</a
+          >
+          {{else}}
+          <span class="pagination-btn disabled">← Previous</span>
+          {{end}}
+
+          <span class="pagination-info"
+            >Page {{.CurrentPage}} of {{.TotalPages}}</span
+          >
+
+          {{if .HasNext}}
+          <a
+            href="?page={{.NextPage}}{{if .Tag}}&tag={{.Tag}}{{end}}"
+            class="pagination-btn"
+            >Next →</a
+          >
+          {{else}}
+          <span class="pagination-btn disabled">Next →</span>
+          {{end}}
+        </div>
+        {{end}} {{end}} {{else}}
+        <p>
+          No blog posts yet. Create a new markdown file in the
+          <code>posts</code> folder to get started!
+        </p>
+        {{end}}
+      </div>
+    </main>
+
+    <footer>
+      <p>
+        &copy; 2025
+        <a
+          href="https://github.com/mojoaar/podium"
+          target="_blank"
+          rel="noopener"
+          >{{.SiteTitle}}</a
+        >. Built with Go and Gin ♥
+      </p>
+    </footer>
+
+    <script src="/assets/theme-toggle.js"></script>
+  </body>
+</html>
