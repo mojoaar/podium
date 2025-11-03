@@ -110,6 +110,8 @@ site_title: "Podium"
 site_description: "A simple and elegant blogging platform"
 site_author: "Morten Johansen"
 site_url: "http://localhost:8080"
+home_intro: "Podium is a lightweight web application built with Go and the Gin framework. It supports markdown-based blog posts and static pages that automatically appear in the navigation when added."
+show_quick_links: true
 
 # Server Settings
 port: 8080
@@ -136,6 +138,8 @@ assets_folder: "assets"
 - `site_description` - A brief description of your site (used in meta tags and homepage)
 - `site_author` - Your name (appears in footer)
 - `site_url` - Full URL of your site (used in RSS feed and sitemap)
+- `home_intro` - Introduction text displayed on the homepage (appears in the About section)
+- `show_quick_links` - Toggle Quick Links section on homepage (true/false, default: true)
 - `port` - The port number the server will run on (default: 8080)
 - `posts_per_page` - Number of posts to show per page (default: 10)
 - `feed_items` - Number of items to include in RSS feed (default: 20)

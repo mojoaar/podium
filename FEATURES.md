@@ -172,6 +172,8 @@ site_title: "Podium"
 site_description: "A simple and elegant blogging platform"
 site_author: "Morten Johansen"
 site_url: "http://localhost:8080"
+home_intro: "Podium is a lightweight web application built with Go and the Gin framework. It supports markdown-based blog posts and static pages that automatically appear in the navigation when added."
+show_quick_links: true
 
 # Server
 port: 8080
@@ -191,6 +193,20 @@ static_folder: "static"
 templates_folder: "templates"
 assets_folder: "assets"
 ```
+
+**Configuration Options:**
+
+- `site_title` - Website name (navigation & titles)
+- `site_description` - Site description (meta tags & homepage)
+- `site_author` - Author name (footer)
+- `site_url` - Full site URL (RSS & sitemap)
+- `home_intro` - Homepage introduction text (About section)
+- `show_quick_links` - Toggle Quick Links section on homepage (true/false)
+- `port` - Server port (default: 8080)
+- `posts_per_page` - Posts per page (default: 10)
+- `feed_items` - RSS feed items (default: 20)
+- `excerpt_length` - Excerpt character limit (default: 200)
+- Folder paths for content, templates, and assets
 
 ### 🔧 **Fallback Defaults**
 
