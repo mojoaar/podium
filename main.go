@@ -61,6 +61,7 @@ type Page struct {
 	SiteDesc    string
 	SiteAuthor  string
 	IsDraft     bool
+	CurrentYear string
 }
 
 type PageLink struct {
@@ -84,6 +85,7 @@ type Post struct {
 	Date        string
 	IsDraft     bool
 	ReadingTime string
+	CurrentYear string
 }
 
 // program implements the service.Interface
@@ -117,6 +119,7 @@ func (p *program) run() {
 			"SiteAuthor":     appConfig.SiteAuthor,
 			"HomeIntro":      appConfig.HomeIntro,
 			"ShowQuickLinks": appConfig.ShowQuickLinks,
+			"CurrentYear":    getCurrentYear(),
 		})
 	})
 
@@ -126,9 +129,10 @@ func (p *program) run() {
 		content, title, _, _, isDraft, _, err := loadMarkdownFile("static", slug)
 		if err != nil {
 			c.HTML(http.StatusNotFound, "error.html", gin.H{
-				"Error":      "Page not found",
-				"Pages":      getStaticPages(),
-				"SiteTitle":  appConfig.SiteTitle,
+				"Error":       "Page not found",
+				"Pages":       getStaticPages(),
+				"SiteTitle":   appConfig.SiteTitle,
+				"CurrentYear": getCurrentYear(),
 			})
 			return
 		}
@@ -136,22 +140,24 @@ func (p *program) run() {
 		// Don't show draft pages
 		if isDraft {
 			c.HTML(http.StatusNotFound, "error.html", gin.H{
-				"Error":      "Page not found",
-				"Pages":      getStaticPages(),
-				"SiteTitle":  appConfig.SiteTitle,
+				"Error":       "Page not found",
+				"Pages":       getStaticPages(),
+				"SiteTitle":   appConfig.SiteTitle,
+				"CurrentYear": getCurrentYear(),
 			})
 			return
 		}
 
 		pages := getStaticPages()
 		c.HTML(http.StatusOK, "page.html", Page{
-			Title:      title,
-			Content:    template.HTML(content),
-			Pages:      pages,
-			SiteTitle:  appConfig.SiteTitle,
-			SiteDesc:   appConfig.SiteDescription,
-			SiteAuthor: appConfig.SiteAuthor,
-			IsDraft:    isDraft,
+			Title:       title,
+			Content:     template.HTML(content),
+			Pages:       pages,
+			SiteTitle:   appConfig.SiteTitle,
+			SiteDesc:    appConfig.SiteDescription,
+			SiteAuthor:  appConfig.SiteAuthor,
+			IsDraft:     isDraft,
+			CurrentYear: getCurrentYear(),
 		})
 	})
 
@@ -201,6 +207,7 @@ func (p *program) run() {
 			"HasNext":     page < totalPages,
 			"PrevPage":    page - 1,
 			"NextPage":    page + 1,
+			"CurrentYear": getCurrentYear(),
 		})
 	})
 
@@ -210,9 +217,10 @@ func (p *program) run() {
 		content, title, tags, date, isDraft, plainText, err := loadMarkdownFile("posts", slug)
 		if err != nil {
 			c.HTML(http.StatusNotFound, "error.html", gin.H{
-				"Error":     "Post not found",
-				"Pages":     getStaticPages(),
-				"SiteTitle": appConfig.SiteTitle,
+				"Error":       "Post not found",
+				"Pages":       getStaticPages(),
+				"SiteTitle":   appConfig.SiteTitle,
+				"CurrentYear": getCurrentYear(),
 			})
 			return
 		}
@@ -220,9 +228,10 @@ func (p *program) run() {
 		// Don't show draft posts
 		if isDraft {
 			c.HTML(http.StatusNotFound, "error.html", gin.H{
-				"Error":     "Post not found",
-				"Pages":     getStaticPages(),
-				"SiteTitle": appConfig.SiteTitle,
+				"Error":       "Post not found",
+				"Pages":       getStaticPages(),
+				"SiteTitle":   appConfig.SiteTitle,
+				"CurrentYear": getCurrentYear(),
 			})
 			return
 		}
@@ -241,6 +250,7 @@ func (p *program) run() {
 			Date:        date,
 			IsDraft:     isDraft,
 			ReadingTime: readingTime,
+			CurrentYear: getCurrentYear(),
 		})
 	})
 
@@ -302,6 +312,7 @@ func (p *program) run() {
 			"HasNext":     page < totalPages,
 			"PrevPage":    page - 1,
 			"NextPage":    page + 1,
+			"CurrentYear": getCurrentYear(),
 		})
 	})
 
@@ -719,6 +730,11 @@ func calculateReadingTime(text string) string {
 	}
 	
 	return fmt.Sprintf("%d min read", minutes)
+}
+
+// getCurrentYear returns the current year as a string
+func getCurrentYear() string {
+	return fmt.Sprintf("%d", time.Now().Year())
 }
 
 // getStaticPages scans the static folder and returns all available pages
