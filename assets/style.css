@@ -353,6 +353,11 @@ main {
   border-radius: 5px;
   overflow-x: auto;
   margin-bottom: 1rem;
+}
+
+/* Only add position relative if not inside wrapper */
+.post-content pre:not(.code-block-wrapper pre),
+.page-content pre:not(.code-block-wrapper pre) {
   position: relative;
 }
 
@@ -372,12 +377,7 @@ main {
   border-radius: 5px;
 }
 
-/* Code block wrapper for copy button */
-.code-block-wrapper {
-  position: relative;
-  margin-bottom: 1rem;
-}
-
+/* Copy code button */
 .copy-code-btn {
   position: absolute;
   top: 0.5rem;
