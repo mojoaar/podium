@@ -38,8 +38,11 @@
         {{if .Posts}}
         <div class="posts-list">
           {{range .Posts}}
-          <article class="post-preview">
-            <h2><a href="/posts/{{.Slug}}">{{.Title}}</a></h2>
+          <article class="post-preview{{if .Featured}} featured{{end}}">
+            <h2>
+              {{if .Featured}}<span class="featured-badge">⭐</span>{{end}}
+              <a href="/posts/{{.Slug}}">{{.Title}}</a>
+            </h2>
             {{if .Date}}
             <p class="post-date">
               📅 {{.Date}}{{if .ReadingTime}} • ⏱️ {{.ReadingTime}}{{end}}

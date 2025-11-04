@@ -29,6 +29,8 @@ _Mobile-responsive design with touch-friendly navigation_
 - 🏷️ **Tags support** for blog posts with automatic filtering
 - 💻 **Syntax highlighting** for code blocks (140+ languages via highlight.js)
 - 📅 **Date timestamps** for blog posts with newest-first sorting
+- ⭐ **Featured posts** - Pin important posts to the top of the blog list
+- 📆 **Post scheduling** - Publish posts automatically at future dates/times
 - 📄 **Draft support** - hide posts and pages until ready to publish
 - 🔖 **Post excerpts** on list pages with configurable length
 - ⏱️ **Reading time estimates** for blog posts
@@ -322,16 +324,19 @@ GOOS=darwin GOARCH=arm64 go build -o bin/podium-darwin-arm64 .
 2. Optionally add front matter at the top:
    - `Tags: tag1, tag2, tag3` - Add tags for categorization
    - `Date: 2025-11-03` - Publication date (YYYY-MM-DD format)
+   - `PublishDate: 2025-12-01 09:00` - Schedule post for future publication
+   - `Featured: true` - Pin post to top of blog list with special badge
    - `Draft: true` - Mark as draft to hide from public view
 3. Start your content with a heading (e.g., `# My Post Title`)
 4. Write your content using Markdown syntax
-5. The post will automatically appear in the blog posts list (unless it's a draft)
+5. The post will automatically appear in the blog posts list (unless it's a draft or scheduled for future)
 
 Example:
 
 ```markdown
 Tags: golang, tutorial, webdev
 Date: 2025-11-03
+Featured: true
 
 # My Awesome Post
 
@@ -350,9 +355,24 @@ fmt.Println("Hello, Podium!")
 
 - **Tags**: Automatically extracted and displayed on posts. Click a tag to filter posts.
 - **Dates**: Posts are sorted by date (newest first) and show publication date and reading time.
+- **Featured Posts**: Add `Featured: true` to pin posts to the top of the list with a ⭐ badge and special styling. Perfect for announcements or popular content.
+- **Post Scheduling**: Add `PublishDate: 2025-12-01 09:00` to schedule a post for future publication. Format is `YYYY-MM-DD HH:MM` (24-hour time). Posts remain hidden until the publish date/time arrives.
 - **Drafts**: Add `Draft: true` to hide a post until you're ready to publish.
 - **Excerpts**: The first 200 characters (configurable) appear on the posts list page.
 - **Reading Time**: Automatically calculated based on word count (~225 words/minute).
+
+#### Post Scheduling Example
+
+```markdown
+Tags: announcement
+Date: 2025-11-05
+PublishDate: 2025-12-01 09:00
+
+# Future Announcement
+
+This post will automatically become visible on December 1st, 2025 at 9:00 AM.
+No server restart needed!
+```
 
 ### Creating Static Pages
 

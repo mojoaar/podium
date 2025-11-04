@@ -199,6 +199,7 @@ main {
 .posts-list {
   display: grid;
   gap: 1.5rem;
+  margin-top: 2rem;
 }
 
 .post-preview {
@@ -209,9 +210,38 @@ main {
   transition: transform 0.3s, box-shadow 0.3s;
 }
 
+.post-preview.featured {
+  background: linear-gradient(
+    135deg,
+    var(--bg-tertiary) 0%,
+    var(--bg-secondary) 100%
+  );
+  border-left: 4px solid #ffc107;
+  box-shadow: 0 2px 8px rgba(255, 193, 7, 0.2);
+}
+
 .post-preview:hover {
   transform: translateX(5px);
   box-shadow: 0 4px 12px var(--shadow-md);
+}
+
+.post-preview.featured:hover {
+  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+}
+
+.featured-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+  color: #000;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-right: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  vertical-align: middle;
+  box-shadow: 0 2px 4px rgba(255, 193, 7, 0.3);
 }
 
 .post-preview h2 {

@@ -47,6 +47,31 @@ Comprehensive list of all features in Podium.
 - Drafts hidden from public view
 - Perfect for work-in-progress content
 
+### ⭐ **Featured Posts**
+
+- Pin important posts to the top (`Featured: true`)
+- Special ⭐ Featured badge displayed
+- Enhanced visual styling with gradient background
+- Golden accent color and shadow
+- Featured posts sorted by date among themselves
+- Perfect for announcements, popular content, or highlights
+- Appears before regular posts in listings
+
+### 📆 **Post Scheduling**
+
+- Schedule posts for future publication
+- Format: `PublishDate: 2025-12-01 09:00` (YYYY-MM-DD HH:MM)
+- Posts hidden until publish date/time
+- Automatic visibility once scheduled time arrives
+- No server restart required
+- Hidden from:
+  - Blog posts list
+  - Individual post pages
+  - Tag filtering
+  - RSS feed
+  - Sitemap
+- Perfect for timed announcements and content planning
+
 ### 🔖 **Post Excerpts**
 
 - Automatic excerpt generation

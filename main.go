@@ -79,8 +79,10 @@ type PageLink struct {
 	Slug        string
 	Tags        []string
 	Date        string
+	PublishDate string
 	Excerpt     string
 	ReadingTime string
+	Featured    bool
 }
 
 type Post struct {
@@ -93,9 +95,11 @@ type Post struct {
 	SiteDesc    string
 	SiteAuthor  string
 	Date        string
+	PublishDate string
 	IsDraft     bool
 	ReadingTime string
 	CurrentYear string
+	Featured    bool
 }
 
 // program implements the service.Interface
@@ -329,7 +333,7 @@ func (p *program) run() {
 	// Static pages route
 	p.router.GET("/page/:slug", func(c *gin.Context) {
 		slug := c.Param("slug")
-		content, title, _, _, isDraft, _, err := loadMarkdownFile("static", slug)
+		content, title, _, _, _, isDraft, _, _, err := loadMarkdownFile("static", slug)
 		if err != nil {
 			c.HTML(http.StatusNotFound, "error.html", gin.H{
 				"Error":       "Page not found",
@@ -417,7 +421,7 @@ func (p *program) run() {
 	// Individual blog post route
 	p.router.GET("/posts/:slug", func(c *gin.Context) {
 		slug := c.Param("slug")
-		content, title, tags, date, isDraft, plainText, err := loadMarkdownFile("posts", slug)
+		content, title, tags, date, publishDate, isDraft, isFeatured, plainText, err := loadMarkdownFile("posts", slug)
 		if err != nil {
 			c.HTML(http.StatusNotFound, "error.html", gin.H{
 				"Error":       "Post not found",
@@ -439,6 +443,21 @@ func (p *program) run() {
 			return
 		}
 
+		// Check if post is scheduled for future publication
+		if publishDate != "" {
+			pubTime, err := time.Parse("2006-01-02 15:04", publishDate)
+			if err == nil && time.Now().Before(pubTime) {
+				// Post is scheduled for the future, don't show it yet
+				c.HTML(http.StatusNotFound, "error.html", gin.H{
+					"Error":       "Post not found",
+					"Pages":       getStaticPages(),
+					"SiteTitle":   appConfig.SiteTitle,
+					"CurrentYear": getCurrentYear(),
+				})
+				return
+			}
+		}
+
 		pages := getStaticPages()
 		readingTime := calculateReadingTime(plainText)
 		c.HTML(http.StatusOK, "post.html", Post{
@@ -451,9 +470,11 @@ func (p *program) run() {
 			SiteDesc:    appConfig.SiteDescription,
 			SiteAuthor:  appConfig.SiteAuthor,
 			Date:        date,
+			PublishDate: publishDate,
 			IsDraft:     isDraft,
 			ReadingTime: readingTime,
 			CurrentYear: getCurrentYear(),
+			Featured:    isFeatured,
 		})
 	})
 
@@ -873,23 +894,25 @@ func handleServiceAction(s service.Service, action string) error {
 }
 
 // loadMarkdownFile reads and converts a markdown file to HTML
-func loadMarkdownFile(folder, slug string) (string, string, []string, string, bool, string, error) {
+func loadMarkdownFile(folder, slug string) (string, string, []string, string, string, bool, bool, string, error) {
 	filePath := filepath.Join(folder, slug+".md")
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		return "", "", nil, "", false, "", err
+		return "", "", nil, "", "", false, false, "", err
 	}
 
-	// Parse front matter for metadata (tags, date, draft)
+	// Parse front matter for metadata (tags, date, publishDate, featured, draft)
 	lines := strings.Split(string(content), "\n")
 	var tags []string
 	title := slug
 	var date string
+	var publishDate string
 	var isDraft bool
+	var isFeatured bool
 	var contentStartLine int
 	var frontMatterLines []int
 	
-	// Check for front matter (tags, date, draft)
+	// Check for front matter (tags, date, publishDate, featured, draft)
 	for i, line := range lines {
 		if strings.HasPrefix(line, "# ") {
 			title = strings.TrimPrefix(line, "# ")
@@ -916,6 +939,20 @@ func loadMarkdownFile(folder, slug string) (string, string, []string, string, bo
 			date = strings.TrimSpace(date)
 			frontMatterLines = append(frontMatterLines, i)
 		}
+		if strings.HasPrefix(line, "PublishDate:") || strings.HasPrefix(line, "publishDate:") || strings.HasPrefix(line, "publish_date:") {
+			publishDate = strings.TrimPrefix(line, "PublishDate:")
+			publishDate = strings.TrimPrefix(publishDate, "publishDate:")
+			publishDate = strings.TrimPrefix(publishDate, "publish_date:")
+			publishDate = strings.TrimSpace(publishDate)
+			frontMatterLines = append(frontMatterLines, i)
+		}
+		if strings.HasPrefix(line, "Featured:") || strings.HasPrefix(line, "featured:") {
+			featuredStr := strings.TrimPrefix(line, "Featured:")
+			featuredStr = strings.TrimPrefix(featuredStr, "featured:")
+			featuredStr = strings.TrimSpace(featuredStr)
+			isFeatured = strings.ToLower(featuredStr) == "true"
+			frontMatterLines = append(frontMatterLines, i)
+		}
 		if strings.HasPrefix(line, "Draft:") || strings.HasPrefix(line, "draft:") {
 			draftStr := strings.TrimPrefix(line, "Draft:")
 			draftStr = strings.TrimPrefix(draftStr, "draft:")
@@ -924,7 +961,7 @@ func loadMarkdownFile(folder, slug string) (string, string, []string, string, bo
 			frontMatterLines = append(frontMatterLines, i)
 		}
 		// Don't process beyond the title
-		if i > 15 {
+		if i > 20 {
 			break
 		}
 	}
@@ -959,7 +996,7 @@ func loadMarkdownFile(folder, slug string) (string, string, []string, string, bo
 	// Get plain text content for excerpts
 	plainText := stripHTML(htmlWithLazyLoad)
 
-	return htmlWithLazyLoad, title, tags, date, isDraft, plainText, nil
+	return htmlWithLazyLoad, title, tags, date, publishDate, isDraft, isFeatured, plainText, nil
 }
 
 // addLazyLoadingToImages adds loading="lazy" attribute to all img tags for better performance
@@ -1005,7 +1042,7 @@ func generateRSSFeed(posts []PageLink, buildDate string) string {
 		}
 		
 		// Load post content for description
-		content, _, _, _, _, _, err := loadMarkdownFile("posts", post.Slug)
+		content, _, _, _, _, _, _, _, err := loadMarkdownFile("posts", post.Slug)
 		if err == nil {
 			// Truncate content for RSS description (first 200 chars)
 			description := stripHTML(content)
@@ -1184,7 +1221,7 @@ func getStaticPages() []PageLink {
 			slug := strings.TrimSuffix(file.Name(), ".md")
 			
 			// Read file to get title and draft status
-			_, title, _, _, isDraft, _, err := loadMarkdownFile("static", slug)
+			_, title, _, _, _, isDraft, _, _, err := loadMarkdownFile("static", slug)
 			if err != nil {
 				continue
 			}
@@ -1207,6 +1244,7 @@ func getStaticPages() []PageLink {
 // getBlogPosts scans the posts folder and returns all available posts
 func getBlogPosts() []PageLink {
 	var posts []PageLink
+	var featuredPosts []PageLink
 
 	files, err := ioutil.ReadDir("posts")
 	if err != nil {
@@ -1218,8 +1256,8 @@ func getBlogPosts() []PageLink {
 		if !file.IsDir() && strings.HasSuffix(file.Name(), ".md") {
 			slug := strings.TrimSuffix(file.Name(), ".md")
 			
-			// Read file to get title, tags, date, draft status, and content for excerpt
-			_, title, tags, date, isDraft, plainText, err := loadMarkdownFile("posts", slug)
+			// Read file to get title, tags, date, publishDate, draft status, featured, and content for excerpt
+			_, title, tags, date, publishDate, isDraft, isFeatured, plainText, err := loadMarkdownFile("posts", slug)
 			if err != nil {
 				continue
 			}
@@ -1228,21 +1266,54 @@ func getBlogPosts() []PageLink {
 			if isDraft {
 				continue
 			}
+
+			// Check if post is scheduled for future publication
+			if publishDate != "" {
+				pubTime, err := time.Parse("2006-01-02 15:04", publishDate)
+				if err == nil && time.Now().Before(pubTime) {
+					// Post is scheduled for the future, skip it
+					continue
+				}
+			}
 			
 			// Generate excerpt and reading time
 			excerpt := generateExcerpt(plainText, appConfig.ExcerptLength)
 			readingTime := calculateReadingTime(plainText)
 
-			posts = append(posts, PageLink{
+			postLink := PageLink{
 				Title:       title,
 				Slug:        slug,
 				Tags:        tags,
 				Date:        date,
+				PublishDate: publishDate,
 				Excerpt:     excerpt,
 				ReadingTime: readingTime,
-			})
+				Featured:    isFeatured,
+			}
+
+			// Separate featured and regular posts
+			if isFeatured {
+				featuredPosts = append(featuredPosts, postLink)
+			} else {
+				posts = append(posts, postLink)
+			}
 		}
 	}
+
+	// Sort featured posts by date (newest first)
+	sort.Slice(featuredPosts, func(i, j int) bool {
+		dateI, errI := time.Parse("2006-01-02", featuredPosts[i].Date)
+		dateJ, errJ := time.Parse("2006-01-02", featuredPosts[j].Date)
+		
+		if errI != nil {
+			return false
+		}
+		if errJ != nil {
+			return true
+		}
+		
+		return dateI.After(dateJ)
+	})
 
 	// Sort posts by date (newest first)
 	sort.Slice(posts, func(i, j int) bool {
@@ -1260,7 +1331,9 @@ func getBlogPosts() []PageLink {
 		return dateI.After(dateJ)
 	})
 
-	return posts
+	// Combine featured posts first, then regular posts
+	allPosts := append(featuredPosts, posts...)
+	return allPosts
 }
 
 // createFoldersIfNotExist creates necessary folders on startup
