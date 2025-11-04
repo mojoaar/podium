@@ -23,7 +23,7 @@ _Mobile-responsive design with touch-friendly navigation_
 - 📄 Create static pages in Markdown
 - 🔄 Automatic navigation generation - new static pages automatically appear in the menu
 - 🎨 Clean, responsive design with **dark/light theme toggle**
-- ⚡ Fast and lightweight
+- ⚡ Fast and lightweight with **HTTP caching** and **lazy-loaded images**
 - 🔧 **Cross-platform system service support** (Windows, macOS, Linux)
 - 🏷️ **Tags support** for blog posts with automatic filtering
 - 💻 **Syntax highlighting** for code blocks (140+ languages via highlight.js)
@@ -38,6 +38,7 @@ _Mobile-responsive design with touch-friendly navigation_
 - 📄 **Pagination** for long post lists
 - 🔗 **Share buttons** for social media (Twitter, LinkedIn, Facebook, Reddit)
 - ⚙️ **YAML configuration** for easy customization
+- 🔥 **Hot reload** in development mode for faster iteration
 
 ## Project Structure
 
@@ -156,10 +157,20 @@ assets_folder: "assets"
 Start the server:
 
 ```bash
+# Production mode
 go run main.go
+
+# Development mode with hot reload
+go run main.go -dev
 ```
 
 The application will start on `http://localhost:8080`
+
+**Development Mode Features:**
+
+- **Hot reload** - Automatically reloads templates and config when files change
+- **Debug logging** - More verbose output for troubleshooting
+- **No caching** - Fresh content on every request for easier development
 
 ## Running Podium
 
@@ -172,8 +183,13 @@ Perfect for development, testing, or quick usage:
 **Option 1: Run with Go (Development)**
 
 ```bash
+# Production mode
 go run main.go
-# or
+
+# Development mode with hot reload (recommended for development)
+go run main.go -dev
+
+# Or use make
 make run
 ```
 
@@ -414,6 +430,7 @@ These are automatically included on all blog posts.
 - [Blackfriday](https://github.com/russross/blackfriday) v2.1.0 - Markdown parser
 - [Service](https://github.com/kardianos/service) - Cross-platform service management
 - [YAML](https://gopkg.in/yaml.v3) - YAML configuration parser
+- [fsnotify](https://github.com/fsnotify/fsnotify) v1.9.0 - File system notifications for hot reload
 - [Highlight.js](https://highlightjs.org/) v11.9.0 (CDN) - Syntax highlighting
 
 ## System Service Installation

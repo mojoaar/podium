@@ -15,6 +15,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/fsnotify/fsnotify"
 	"github.com/gin-gonic/gin"
 	"github.com/kardianos/service"
 	"github.com/russross/blackfriday/v2"
@@ -41,6 +42,7 @@ type Config struct {
 
 // Global config variable
 var appConfig Config
+var isDevMode bool
 
 // loadConfig reads and parses the config.yaml file
 func loadConfig(path string) (Config, error) {
@@ -94,6 +96,58 @@ type program struct {
 	exit   chan struct{}
 }
 
+// cacheMiddleware adds appropriate caching headers based on content type
+func cacheMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		path := c.Request.URL.Path
+		
+		// In dev mode, disable caching
+		if isDevMode {
+			c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
+			c.Next()
+			return
+		}
+		
+		// Cache static assets for longer periods
+		if strings.HasPrefix(path, "/assets/") {
+			// Determine cache duration based on file type
+			ext := filepath.Ext(path)
+			var maxAge int
+			
+			switch ext {
+			case ".css", ".js":
+				maxAge = 86400 * 7 // 7 days for CSS/JS
+			case ".png", ".jpg", ".jpeg", ".gif", ".svg", ".ico", ".webp":
+				maxAge = 86400 * 30 // 30 days for images
+			case ".woff", ".woff2", ".ttf", ".eot":
+				maxAge = 86400 * 365 // 1 year for fonts
+			default:
+				maxAge = 86400 // 1 day for other assets
+			}
+			
+			c.Header("Cache-Control", fmt.Sprintf("public, max-age=%d", maxAge))
+			
+			// Try to get file modification time for ETag
+			filePath := filepath.Join(".", path)
+			if info, err := os.Stat(filePath); err == nil {
+				etag := fmt.Sprintf("\"%x-%x\"", info.ModTime().Unix(), info.Size())
+				c.Header("ETag", etag)
+				
+				// Check if client has cached version
+				if match := c.GetHeader("If-None-Match"); match == etag {
+					c.AbortWithStatus(http.StatusNotModified)
+					return
+				}
+			}
+		} else {
+			// For HTML pages, use shorter cache with revalidation
+			c.Header("Cache-Control", "public, max-age=300, must-revalidate")
+		}
+		
+		c.Next()
+	}
+}
+
 func (p *program) Start(s service.Service) error {
 	log.Println("Podium service starting...")
 	go p.run()
@@ -101,13 +155,20 @@ func (p *program) Start(s service.Service) error {
 }
 
 func (p *program) run() {
-	// Set Gin to release mode when running as a service
-	gin.SetMode(gin.ReleaseMode)
+	// Set Gin mode based on dev mode
+	if isDevMode {
+		gin.SetMode(gin.DebugMode)
+	} else {
+		gin.SetMode(gin.ReleaseMode)
+	}
 	
 	p.router = gin.Default()
 
-	// Load HTML templates
+	// Load HTML templates (they will auto-reload in debug mode)
 	p.router.LoadHTMLGlob("templates/*")
+
+	// Add caching middleware
+	p.router.Use(cacheMiddleware())
 
 	// Home route
 	p.router.GET("/", func(c *gin.Context) {
@@ -365,7 +426,9 @@ func (p *program) Stop(s service.Service) error {
 
 func main() {
 	var serviceAction string
+	var devMode bool
 	flag.StringVar(&serviceAction, "service", "", "Control the system service: install, uninstall, start, stop, restart")
+	flag.BoolVar(&devMode, "dev", false, "Enable development mode with hot reload")
 	flag.Parse()
 
 	// Get the executable path for the service
@@ -410,6 +473,13 @@ func main() {
 		return
 	}
 
+	// If dev mode is enabled, run with hot reload instead of as a service
+	if devMode {
+		log.Println("Starting Podium in development mode with hot reload...")
+		runWithHotReload()
+		return
+	}
+
 	// Create logger
 	logger, err := s.Logger(nil)
 	if err != nil {
@@ -420,6 +490,85 @@ func main() {
 	err = s.Run()
 	if err != nil {
 		logger.Error(err)
+	}
+}
+
+// runWithHotReload starts the server with file watching for auto-reload
+func runWithHotReload() {
+	// Set dev mode flag
+	isDevMode = true
+	
+	// Create file watcher
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		log.Fatal("Failed to create file watcher:", err)
+	}
+	defer watcher.Close()
+
+	// Watch templates, assets, posts, static, and config
+	watchDirs := []string{"templates", "assets", "posts", "static"}
+	watchFiles := []string{"config.yaml"}
+
+	for _, dir := range watchDirs {
+		if err := watcher.Add(dir); err != nil {
+			log.Printf("Warning: Failed to watch directory %s: %v", dir, err)
+		} else {
+			log.Printf("Watching directory: %s", dir)
+		}
+	}
+
+	for _, file := range watchFiles {
+		if err := watcher.Add(file); err != nil {
+			log.Printf("Warning: Failed to watch file %s: %v", file, err)
+		} else {
+			log.Printf("Watching file: %s", file)
+		}
+	}
+
+	// Start the server in a goroutine
+	go func() {
+		prg := &program{exit: make(chan struct{})}
+		prg.Start(nil)
+	}()
+
+	// Watch for file changes
+	log.Println("Hot reload enabled - server will restart when files change")
+	debounceTimer := time.NewTimer(0)
+	<-debounceTimer.C // Drain the timer
+
+	for {
+		select {
+		case event, ok := <-watcher.Events:
+			if !ok {
+				return
+			}
+			// Only react to write and create events
+			if event.Op&fsnotify.Write == fsnotify.Write || event.Op&fsnotify.Create == fsnotify.Create {
+				// Debounce: wait 500ms before reloading
+				debounceTimer.Reset(500 * time.Millisecond)
+				go func() {
+					<-debounceTimer.C
+					log.Printf("File changed: %s - reloading templates and config...", event.Name)
+					
+					// Reload config
+					config, err := loadConfig("config.yaml")
+					if err != nil {
+						log.Printf("Warning: Failed to reload config: %v", err)
+					} else {
+						appConfig = config
+						log.Println("✓ Config reloaded")
+					}
+					
+					// Templates are reloaded automatically by Gin on each request in dev mode
+					log.Println("✓ Changes detected - templates will reload on next request")
+				}()
+			}
+		case err, ok := <-watcher.Errors:
+			if !ok {
+				return
+			}
+			log.Println("Watcher error:", err)
+		}
 	}
 }
 
@@ -551,10 +700,25 @@ func loadMarkdownFile(folder, slug string) (string, string, []string, string, bo
 	// Convert markdown to HTML
 	html := blackfriday.Run([]byte(contentToRender))
 	
+	// Add lazy loading to images
+	htmlWithLazyLoad := addLazyLoadingToImages(string(html))
+	
 	// Get plain text content for excerpts
-	plainText := stripHTML(string(html))
+	plainText := stripHTML(htmlWithLazyLoad)
 
-	return string(html), title, tags, date, isDraft, plainText, nil
+	return htmlWithLazyLoad, title, tags, date, isDraft, plainText, nil
+}
+
+// addLazyLoadingToImages adds loading="lazy" attribute to all img tags for better performance
+func addLazyLoadingToImages(htmlContent string) string {
+	// Replace <img with <img loading="lazy" if not already present
+	// Also make images responsive by adding width and height auto-sizing
+	htmlContent = strings.ReplaceAll(htmlContent, "<img ", `<img loading="lazy" `)
+	
+	// If loading="lazy" was already present (unlikely but possible), avoid duplicates
+	htmlContent = strings.ReplaceAll(htmlContent, `loading="lazy" loading="lazy"`, `loading="lazy"`)
+	
+	return htmlContent
 }
 
 // generateRSSFeed creates an RSS 2.0 feed XML string

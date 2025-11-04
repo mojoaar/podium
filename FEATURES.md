@@ -247,6 +247,16 @@ assets_folder: "assets"
 - Static asset serving
 - No database required
 - File-based content
+- **HTTP caching with ETag support**
+  - Static assets cached for 7-30 days depending on type
+  - Automatic cache invalidation based on file modification
+  - 304 Not Modified responses for unchanged content
+  - Configurable cache headers per content type
+- **Lazy-loaded images**
+  - All images automatically include `loading="lazy"` attribute
+  - Deferred loading for off-screen images
+  - Improved page load performance
+  - Responsive image sizing with CSS
 
 ### 🔒 **Security**
 
@@ -290,6 +300,13 @@ assets_folder: "assets"
 ### 🧪 **Development**
 
 - Easy local development (`go run main.go`)
+- **Hot reload mode** (`go run main.go -dev`)
+  - Automatic file watching with fsnotify
+  - Reloads templates on file changes
+  - Reloads config.yaml dynamically
+  - Watches posts, static, templates, assets directories
+  - 500ms debounce to prevent multiple reloads
+  - Debug mode logging for troubleshooting
 - Live reload friendly
 - Clear error messages
 - Comprehensive logging

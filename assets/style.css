@@ -389,6 +389,16 @@ main {
   color: var(--text-secondary);
 }
 
+.post-content img,
+.page-content img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1.5rem auto;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px var(--shadow-sm);
+}
+
 .post-footer {
   margin-top: 3rem;
   padding-top: 2rem;
