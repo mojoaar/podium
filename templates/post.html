@@ -161,8 +161,14 @@
           href="https://github.com/mojoaar/podium"
           target="_blank"
           rel="noopener"
-          >{{.SiteTitle}}</a
-        >{{if .SiteAuthor}} by {{.SiteAuthor}}{{end}}. Built with Go and Gin ♥
+          title="Rocking on Podium!"
+          >Podium</a
+        >{{if .SiteAuthor}} by {{if .SiteAuthorURL}}<a
+          href="{{.SiteAuthorURL}}"
+          target="_blank"
+          rel="noopener"
+          >{{.SiteAuthor}}</a
+        >{{else}}{{.SiteAuthor}}{{end}}{{end}}. Built with Go and Gin ♥
       </p>
       {{if .ShowSocialLinks}}
       <div class="social-links">

@@ -207,6 +207,7 @@ Complete YAML-based configuration in `config.yaml`:
 site_title: "Podium"
 site_description: "A simple and elegant blogging platform"
 site_author: "Morten Johansen"
+site_author_url: "https://johansen.foo"
 site_url: "http://localhost:8080"
 home_intro: "Podium is a lightweight web application built with Go and the Gin framework. It supports markdown-based blog posts and static pages that automatically appear in the navigation when added."
 show_quick_links: true
@@ -244,6 +245,7 @@ assets_folder: "assets"
 - `site_title` - Website name (navigation & titles)
 - `site_description` - Site description (meta tags & homepage)
 - `site_author` - Author name (footer)
+- `site_author_url` - Optional URL to link your name in the footer (e.g., personal website)
 - `site_url` - Full site URL (RSS & sitemap)
 - `home_intro` - Homepage introduction text (About section)
 - `show_quick_links` - Toggle Quick Links section on homepage (true/false)

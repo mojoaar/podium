@@ -115,6 +115,7 @@ Podium uses a `config.yaml` file to configure your site. Create a `config.yaml` 
 site_title: "Podium"
 site_description: "A simple and elegant blogging platform"
 site_author: "Morten Johansen"
+site_author_url: "https://johansen.foo"
 site_url: "http://localhost:8080"
 home_intro: "Podium is a lightweight web application built with Go and the Gin framework. It supports markdown-based blog posts and static pages that automatically appear in the navigation when added."
 show_quick_links: true
@@ -152,6 +153,7 @@ assets_folder: "assets"
 - `site_title` - The name of your website (appears in navigation and page titles)
 - `site_description` - A brief description of your site (used in meta tags and homepage)
 - `site_author` - Your name (appears in footer)
+- `site_author_url` - Optional URL to link your name in the footer (e.g., personal website)
 - `site_url` - Full URL of your site (used in RSS feed and sitemap)
 - `home_intro` - Introduction text displayed on the homepage (appears in the About section)
 - `show_quick_links` - Toggle Quick Links section on homepage (true/false, default: true)

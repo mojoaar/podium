@@ -35,6 +35,7 @@ type Config struct {
 	SiteTitle       string `yaml:"site_title"`
 	SiteDescription string `yaml:"site_description"`
 	SiteAuthor      string `yaml:"site_author"`
+	SiteAuthorURL   string `yaml:"site_author_url"`
 	SiteURL         string `yaml:"site_url"`
 	HomeIntro       string `yaml:"home_intro"`
 	ShowQuickLinks  bool   `yaml:"show_quick_links"`
@@ -77,6 +78,7 @@ type Page struct {
 	SiteTitle        string
 	SiteDesc         string
 	SiteAuthor       string
+	SiteAuthorURL    string
 	IsDraft          bool
 	CurrentYear      string
 	ShowSocialLinks  bool
@@ -108,6 +110,7 @@ type Post struct {
 	SiteTitle        string
 	SiteDesc         string
 	SiteAuthor       string
+	SiteAuthorURL    string
 	Date             string
 	PublishDate      string
 	IsDraft          bool
@@ -351,6 +354,7 @@ func (p *program) run() {
 			"SiteTitle":      appConfig.SiteTitle,
 			"SiteDesc":       appConfig.SiteDescription,
 			"SiteAuthor":     appConfig.SiteAuthor,
+			"SiteAuthorURL":  appConfig.SiteAuthorURL,
 			"HomeIntro":      appConfig.HomeIntro,
 			"ShowQuickLinks": appConfig.ShowQuickLinks,
 			"CurrentYear":    getCurrentYear(),
@@ -373,6 +377,8 @@ func (p *program) run() {
 				"Error":           "Page not found",
 				"Pages":           getStaticPages(),
 				"SiteTitle":       appConfig.SiteTitle,
+				"SiteAuthor":      appConfig.SiteAuthor,
+				"SiteAuthorURL":   appConfig.SiteAuthorURL,
 				"CurrentYear":     getCurrentYear(),
 				"ShowSocialLinks": appConfig.ShowSocialLinks,
 				"SocialTwitter":   appConfig.SocialTwitter,
@@ -391,6 +397,8 @@ func (p *program) run() {
 				"Error":           "Page not found",
 				"Pages":           getStaticPages(),
 				"SiteTitle":       appConfig.SiteTitle,
+				"SiteAuthor":      appConfig.SiteAuthor,
+				"SiteAuthorURL":   appConfig.SiteAuthorURL,
 				"CurrentYear":     getCurrentYear(),
 				"ShowSocialLinks": appConfig.ShowSocialLinks,
 				"SocialTwitter":   appConfig.SocialTwitter,
@@ -411,6 +419,7 @@ func (p *program) run() {
 			SiteTitle:       appConfig.SiteTitle,
 			SiteDesc:        appConfig.SiteDescription,
 			SiteAuthor:      appConfig.SiteAuthor,
+			SiteAuthorURL:   appConfig.SiteAuthorURL,
 			IsDraft:         isDraft,
 			CurrentYear:     getCurrentYear(),
 			ShowSocialLinks: appConfig.ShowSocialLinks,
@@ -463,6 +472,7 @@ func (p *program) run() {
 			"Pages":           pages,
 			"SiteTitle":       appConfig.SiteTitle,
 			"SiteAuthor":      appConfig.SiteAuthor,
+			"SiteAuthorURL":   appConfig.SiteAuthorURL,
 			"CurrentPage":     page,
 			"TotalPages":      totalPages,
 			"HasPrev":         page > 1,
@@ -489,6 +499,8 @@ func (p *program) run() {
 				"Error":           "Post not found",
 				"Pages":           getStaticPages(),
 				"SiteTitle":       appConfig.SiteTitle,
+				"SiteAuthor":      appConfig.SiteAuthor,
+				"SiteAuthorURL":   appConfig.SiteAuthorURL,
 				"CurrentYear":     getCurrentYear(),
 				"ShowSocialLinks": appConfig.ShowSocialLinks,
 				"SocialTwitter":   appConfig.SocialTwitter,
@@ -507,6 +519,8 @@ func (p *program) run() {
 				"Error":           "Post not found",
 				"Pages":           getStaticPages(),
 				"SiteTitle":       appConfig.SiteTitle,
+				"SiteAuthor":      appConfig.SiteAuthor,
+				"SiteAuthorURL":   appConfig.SiteAuthorURL,
 				"CurrentYear":     getCurrentYear(),
 				"ShowSocialLinks": appConfig.ShowSocialLinks,
 				"SocialTwitter":   appConfig.SocialTwitter,
@@ -528,6 +542,8 @@ func (p *program) run() {
 					"Error":           "Post not found",
 					"Pages":           getStaticPages(),
 					"SiteTitle":       appConfig.SiteTitle,
+					"SiteAuthor":      appConfig.SiteAuthor,
+					"SiteAuthorURL":   appConfig.SiteAuthorURL,
 					"CurrentYear":     getCurrentYear(),
 					"ShowSocialLinks": appConfig.ShowSocialLinks,
 					"SocialTwitter":   appConfig.SocialTwitter,
@@ -552,6 +568,7 @@ func (p *program) run() {
 			SiteTitle:       appConfig.SiteTitle,
 			SiteDesc:        appConfig.SiteDescription,
 			SiteAuthor:      appConfig.SiteAuthor,
+			SiteAuthorURL:   appConfig.SiteAuthorURL,
 			Date:            date,
 			PublishDate:     publishDate,
 			IsDraft:         isDraft,
@@ -620,6 +637,7 @@ func (p *program) run() {
 			"Tag":             tag,
 			"SiteTitle":       appConfig.SiteTitle,
 			"SiteAuthor":      appConfig.SiteAuthor,
+			"SiteAuthorURL":   appConfig.SiteAuthorURL,
 			"CurrentPage":     page,
 			"TotalPages":      totalPages,
 			"HasPrev":         page > 1,
