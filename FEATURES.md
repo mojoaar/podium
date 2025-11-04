@@ -23,6 +23,15 @@ Comprehensive list of all features in Podium.
 - New posts automatically added to lists
 - No manual configuration needed
 
+### ❌ **Error Handling**
+
+- Custom 404 error page for not found resources
+- Custom 500 error page for server errors
+- Helpful error messages and suggested actions
+- "Go Home" and "View Posts" quick action buttons
+- Comprehensive error logging for debugging
+- Recovery middleware for graceful error handling
+
 ## Content Management
 
 ### 📅 **Date & Timestamps**
@@ -197,7 +206,7 @@ Comprehensive list of all features in Podium.
 
 ### 🧭 **Routes**
 
-- `/` - Home page
+- `/` - Home page (or redirects to `/posts` if `disable_landing_page` is true)
 - `/posts` - Posts list (paginated)
 - `/posts/:slug` - Individual post
 - `/page/:slug` - Static page
@@ -205,6 +214,8 @@ Comprehensive list of all features in Podium.
 - `/feed.xml` - RSS feed
 - `/sitemap.xml` - Sitemap
 - `/assets/*` - Static assets
+- `404` - Custom error page for not found resources
+- `500` - Custom error page for server errors
 
 ## Configuration
 
@@ -221,6 +232,7 @@ site_author_url: "https://johansen.foo"
 site_url: "http://localhost:8080"
 home_intro: "Podium is a lightweight web application built with Go and the Gin framework. It supports markdown-based blog posts and static pages that automatically appear in the navigation when added."
 show_quick_links: true
+disable_landing_page: false
 
 # Server
 port: 8080
@@ -263,6 +275,7 @@ assets_folder: "assets"
 - `site_url` - Full site URL (RSS & sitemap)
 - `home_intro` - Homepage introduction text (About section)
 - `show_quick_links` - Toggle Quick Links section on homepage (true/false)
+- `disable_landing_page` - If true, shows blog list directly on index instead of landing page and hides "Posts" menu link (true/false, default: false)
 - `port` - Server port (default: 8080)
 - `posts_per_page` - Posts per page (default: 10)
 - `feed_items` - RSS feed items (default: 20)

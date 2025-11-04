@@ -8,6 +8,7 @@ site_author_url: "https://johansen.foo"
 site_url: "http://localhost:8080"
 home_intro: "Podium is a lightweight web application built with Go and the Gin framework. It supports markdown-based blog posts and static pages that automatically appear in the navigation when added."
 show_quick_links: true
+disable_landing_page: false # If true, shows blog list on index instead of landing page
 
 # Server Settings
 port: 8080

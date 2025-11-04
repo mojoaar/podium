@@ -23,6 +23,7 @@ _Mobile-responsive design with touch-friendly navigation_
 - 📄 Create static pages in Markdown
 - 🔄 Automatic navigation generation - new static pages automatically appear in the menu
 - 🎨 Clean, responsive design with **dark/light theme toggle**
+- ❌ **Custom error pages** with helpful 404 and 500 error handling
 - ⚡ Fast and lightweight with **HTTP caching**, **lazy-loaded images**, and **asset minification**
 - �️ **Image optimization** with automatic resizing and quality optimization
 - �🔧 **Cross-platform system service support** (Windows, macOS, Linux)
@@ -121,6 +122,7 @@ site_author_url: "https://johansen.foo"
 site_url: "http://localhost:8080"
 home_intro: "Podium is a lightweight web application built with Go and the Gin framework. It supports markdown-based blog posts and static pages that automatically appear in the navigation when added."
 show_quick_links: true
+disable_landing_page: false
 
 # Server Settings
 port: 8080
@@ -163,6 +165,7 @@ assets_folder: "assets"
 - `site_url` - Full URL of your site (used in RSS feed and sitemap)
 - `home_intro` - Introduction text displayed on the homepage (appears in the About section)
 - `show_quick_links` - Toggle Quick Links section on homepage (true/false, default: true)
+- `disable_landing_page` - If true, shows blog list directly on index instead of landing page and hides "Posts" menu link (true/false, default: false)
 - `port` - The port number the server will run on (default: 8080)
 - `posts_per_page` - Number of posts to show per page (default: 10)
 - `feed_items` - Number of items to include in RSS feed (default: 20)
@@ -437,7 +440,7 @@ This is my about page...
 
 ## Routes
 
-- `/` - Home page
+- `/` - Home page (or redirects to `/posts` if `disable_landing_page` is true)
 - `/posts` - List of all blog posts (with pagination)
 - `/posts/:slug` - Individual blog post (with share buttons)
 - `/page/:slug` - Static page
@@ -445,6 +448,8 @@ This is my about page...
 - `/feed.xml` - RSS/Atom feed for blog subscribers
 - `/sitemap.xml` - XML sitemap for search engines
 - `/assets/*` - Static assets (CSS, JS, images, etc.)
+- `404` - Custom error page for not found resources
+- `500` - Custom error page for server errors
 
 ## Customization
 

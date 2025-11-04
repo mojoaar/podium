@@ -39,6 +39,7 @@ type Config struct {
 	SiteURL         string `yaml:"site_url"`
 	HomeIntro       string `yaml:"home_intro"`
 	ShowQuickLinks  bool   `yaml:"show_quick_links"`
+	DisableLandingPage bool `yaml:"disable_landing_page"`
 	Port            int    `yaml:"port"`
 	PostsFolder     string `yaml:"posts_folder"`
 	StaticFolder    string `yaml:"static_folder"`
@@ -92,6 +93,7 @@ type Page struct {
 	SocialFacebook   string
 	UmamiScriptURL   string
 	UmamiWebsiteID   string
+	DisableLandingPage bool
 }
 
 type PageLink struct {
@@ -130,6 +132,7 @@ type Post struct {
 	SocialFacebook   string
 	UmamiScriptURL   string
 	UmamiWebsiteID   string
+	DisableLandingPage bool
 }
 
 // program implements the service.Interface
@@ -376,6 +379,7 @@ func (p *program) run() {
 					"SocialFacebook":  appConfig.SocialFacebook,
 					"UmamiScriptURL":  appConfig.UmamiScriptURL,
 					"UmamiWebsiteID":  appConfig.UmamiWebsiteID,
+					"DisableLandingPage": appConfig.DisableLandingPage,
 				})
 				c.Abort()
 			}
@@ -391,6 +395,12 @@ func (p *program) run() {
 
 	// Home route
 	p.router.GET("/", func(c *gin.Context) {
+		// If landing page is disabled, redirect to posts list
+		if appConfig.DisableLandingPage {
+			c.Redirect(http.StatusMovedPermanently, "/posts")
+			return
+		}
+		
 		pages := getStaticPages()
 		c.HTML(http.StatusOK, "index.html", gin.H{
 			"Pages":          pages,
@@ -410,6 +420,7 @@ func (p *program) run() {
 			"SocialFacebook":  appConfig.SocialFacebook,
 			"UmamiScriptURL":  appConfig.UmamiScriptURL,
 			"UmamiWebsiteID":  appConfig.UmamiWebsiteID,
+			"DisableLandingPage": appConfig.DisableLandingPage,
 		})
 	})
 
@@ -437,6 +448,7 @@ func (p *program) run() {
 				"SocialFacebook":  appConfig.SocialFacebook,
 				"UmamiScriptURL":  appConfig.UmamiScriptURL,
 				"UmamiWebsiteID":  appConfig.UmamiWebsiteID,
+				"DisableLandingPage": appConfig.DisableLandingPage,
 			})
 			return
 		}
@@ -462,6 +474,7 @@ func (p *program) run() {
 				"SocialFacebook":  appConfig.SocialFacebook,
 				"UmamiScriptURL":  appConfig.UmamiScriptURL,
 				"UmamiWebsiteID":  appConfig.UmamiWebsiteID,
+				"DisableLandingPage": appConfig.DisableLandingPage,
 			})
 			return
 		}
@@ -486,6 +499,7 @@ func (p *program) run() {
 			SocialFacebook:  appConfig.SocialFacebook,
 			UmamiScriptURL:  appConfig.UmamiScriptURL,
 			UmamiWebsiteID:  appConfig.UmamiWebsiteID,
+			DisableLandingPage: appConfig.DisableLandingPage,
 		})
 	})
 
@@ -546,6 +560,7 @@ func (p *program) run() {
 			"SocialFacebook":  appConfig.SocialFacebook,
 			"UmamiScriptURL":  appConfig.UmamiScriptURL,
 			"UmamiWebsiteID":  appConfig.UmamiWebsiteID,
+			"DisableLandingPage": appConfig.DisableLandingPage,
 		})
 	})
 
@@ -573,6 +588,7 @@ func (p *program) run() {
 				"SocialFacebook":  appConfig.SocialFacebook,
 				"UmamiScriptURL":  appConfig.UmamiScriptURL,
 				"UmamiWebsiteID":  appConfig.UmamiWebsiteID,
+				"DisableLandingPage": appConfig.DisableLandingPage,
 			})
 			return
 		}
@@ -598,6 +614,7 @@ func (p *program) run() {
 				"SocialFacebook":  appConfig.SocialFacebook,
 				"UmamiScriptURL":  appConfig.UmamiScriptURL,
 				"UmamiWebsiteID":  appConfig.UmamiWebsiteID,
+				"DisableLandingPage": appConfig.DisableLandingPage,
 			})
 			return
 		}
@@ -626,6 +643,7 @@ func (p *program) run() {
 					"SocialFacebook":  appConfig.SocialFacebook,
 					"UmamiScriptURL":  appConfig.UmamiScriptURL,
 					"UmamiWebsiteID":  appConfig.UmamiWebsiteID,
+					"DisableLandingPage": appConfig.DisableLandingPage,
 				})
 				return
 			}
@@ -658,6 +676,7 @@ func (p *program) run() {
 			SocialFacebook:  appConfig.SocialFacebook,
 			UmamiScriptURL:  appConfig.UmamiScriptURL,
 			UmamiWebsiteID:  appConfig.UmamiWebsiteID,
+			DisableLandingPage: appConfig.DisableLandingPage,
 		})
 	})
 
@@ -730,6 +749,7 @@ func (p *program) run() {
 			"SocialFacebook":  appConfig.SocialFacebook,
 			"UmamiScriptURL":  appConfig.UmamiScriptURL,
 			"UmamiWebsiteID":  appConfig.UmamiWebsiteID,
+			"DisableLandingPage": appConfig.DisableLandingPage,
 		})
 	})
 
@@ -899,6 +919,7 @@ func (p *program) run() {
 			"SocialFacebook":  appConfig.SocialFacebook,
 			"UmamiScriptURL":  appConfig.UmamiScriptURL,
 			"UmamiWebsiteID":  appConfig.UmamiWebsiteID,
+			"DisableLandingPage": appConfig.DisableLandingPage,
 		})
 	})
 
