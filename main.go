@@ -344,7 +344,44 @@ func (p *program) run() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	
-	p.router = gin.Default()
+	// Create router with default middleware (Logger and Recovery)
+	p.router = gin.New()
+	
+	// Add logger middleware
+	p.router.Use(gin.Logger())
+	
+	// Add custom recovery middleware for 500 errors
+	p.router.Use(func(c *gin.Context) {
+		defer func() {
+			if err := recover(); err != nil {
+				// Log the error
+				log.Printf("PANIC RECOVERED: %v", err)
+				
+				pages := getStaticPages()
+				c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+					"Error":           "Internal server error",
+					"ErrorCode":       500,
+					"ErrorMessage":    "Something went wrong on our end. We're working to fix it.",
+					"Pages":           pages,
+					"SiteTitle":       appConfig.SiteTitle,
+					"SiteAuthor":      appConfig.SiteAuthor,
+					"SiteAuthorURL":   appConfig.SiteAuthorURL,
+					"CurrentYear":     getCurrentYear(),
+					"ShowSocialLinks": appConfig.ShowSocialLinks,
+					"SocialTwitter":   appConfig.SocialTwitter,
+					"SocialBluesky":   appConfig.SocialBluesky,
+					"SocialLinkedIn":  appConfig.SocialLinkedIn,
+					"SocialGitHub":    appConfig.SocialGitHub,
+					"SocialReddit":    appConfig.SocialReddit,
+					"SocialFacebook":  appConfig.SocialFacebook,
+					"UmamiScriptURL":  appConfig.UmamiScriptURL,
+					"UmamiWebsiteID":  appConfig.UmamiWebsiteID,
+				})
+				c.Abort()
+			}
+		}()
+		c.Next()
+	})
 
 	// Load HTML templates (they will auto-reload in debug mode)
 	p.router.LoadHTMLGlob("templates/*")
@@ -381,8 +418,11 @@ func (p *program) run() {
 		slug := c.Param("slug")
 		content, title, _, _, _, isDraft, _, _, err := loadMarkdownFile("static", slug)
 		if err != nil {
+			log.Printf("Page not found: %s", slug)
 			c.HTML(http.StatusNotFound, "error.html", gin.H{
 				"Error":           "Page not found",
+				"ErrorCode":       404,
+				"ErrorMessage":    "The page you're looking for doesn't exist.",
 				"Pages":           getStaticPages(),
 				"SiteTitle":       appConfig.SiteTitle,
 				"SiteAuthor":      appConfig.SiteAuthor,
@@ -403,8 +443,11 @@ func (p *program) run() {
 
 		// Don't show draft pages
 		if isDraft {
+			log.Printf("Attempted access to draft page: %s", slug)
 			c.HTML(http.StatusNotFound, "error.html", gin.H{
 				"Error":           "Page not found",
+				"ErrorCode":       404,
+				"ErrorMessage":    "The page you're looking for doesn't exist.",
 				"Pages":           getStaticPages(),
 				"SiteTitle":       appConfig.SiteTitle,
 				"SiteAuthor":      appConfig.SiteAuthor,
@@ -511,8 +554,11 @@ func (p *program) run() {
 		slug := c.Param("slug")
 		content, title, tags, date, publishDate, isDraft, isFeatured, plainText, err := loadMarkdownFile("posts", slug)
 		if err != nil {
+			log.Printf("Post not found: %s", slug)
 			c.HTML(http.StatusNotFound, "error.html", gin.H{
 				"Error":           "Post not found",
+				"ErrorCode":       404,
+				"ErrorMessage":    "The blog post you're looking for doesn't exist.",
 				"Pages":           getStaticPages(),
 				"SiteTitle":       appConfig.SiteTitle,
 				"SiteAuthor":      appConfig.SiteAuthor,
@@ -533,8 +579,11 @@ func (p *program) run() {
 
 		// Don't show draft posts
 		if isDraft {
+			log.Printf("Attempted access to draft post: %s", slug)
 			c.HTML(http.StatusNotFound, "error.html", gin.H{
 				"Error":           "Post not found",
+				"ErrorCode":       404,
+				"ErrorMessage":    "The blog post you're looking for doesn't exist.",
 				"Pages":           getStaticPages(),
 				"SiteTitle":       appConfig.SiteTitle,
 				"SiteAuthor":      appConfig.SiteAuthor,
@@ -558,8 +607,11 @@ func (p *program) run() {
 			pubTime, err := time.Parse("2006-01-02 15:04", publishDate)
 			if err == nil && time.Now().Before(pubTime) {
 				// Post is scheduled for the future, don't show it yet
+				log.Printf("Attempted access to scheduled post: %s (scheduled for %s)", slug, publishDate)
 				c.HTML(http.StatusNotFound, "error.html", gin.H{
 					"Error":           "Post not found",
+					"ErrorCode":       404,
+					"ErrorMessage":    "The blog post you're looking for doesn't exist.",
 					"Pages":           getStaticPages(),
 					"SiteTitle":       appConfig.SiteTitle,
 					"SiteAuthor":      appConfig.SiteAuthor,
@@ -824,6 +876,30 @@ func (p *program) run() {
 		
 		// For other files, serve normally
 		c.File(fullPath)
+	})
+
+	// Custom 404 handler for undefined routes
+	p.router.NoRoute(func(c *gin.Context) {
+		pages := getStaticPages()
+		c.HTML(http.StatusNotFound, "error.html", gin.H{
+			"Error":           "Page not found",
+			"ErrorCode":       404,
+			"ErrorMessage":    "The page you're looking for doesn't exist.",
+			"Pages":           pages,
+			"SiteTitle":       appConfig.SiteTitle,
+			"SiteAuthor":      appConfig.SiteAuthor,
+			"SiteAuthorURL":   appConfig.SiteAuthorURL,
+			"CurrentYear":     getCurrentYear(),
+			"ShowSocialLinks": appConfig.ShowSocialLinks,
+			"SocialTwitter":   appConfig.SocialTwitter,
+			"SocialBluesky":   appConfig.SocialBluesky,
+			"SocialLinkedIn":  appConfig.SocialLinkedIn,
+			"SocialGitHub":    appConfig.SocialGitHub,
+			"SocialReddit":    appConfig.SocialReddit,
+			"SocialFacebook":  appConfig.SocialFacebook,
+			"UmamiScriptURL":  appConfig.UmamiScriptURL,
+			"UmamiWebsiteID":  appConfig.UmamiWebsiteID,
+		})
 	})
 
 	port := fmt.Sprintf(":%d", appConfig.Port)

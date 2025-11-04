@@ -40,9 +40,29 @@
 
     <main>
       <div class="content error-page">
-        <h1>Oops!</h1>
-        <p>{{.Error}}</p>
-        <a href="/">Go back home</a>
+        {{if .ErrorCode}}
+        <div class="error-code">{{.ErrorCode}}</div>
+        {{end}}
+        <h1>{{.Error}}</h1>
+        {{if .ErrorMessage}}
+        <p class="error-description">{{.ErrorMessage}}</p>
+        {{end}}
+
+        <div class="error-actions">
+          <a href="/" class="button primary">← Go Home</a>
+          <a href="/posts" class="button">View Blog Posts</a>
+        </div>
+
+        {{if .Pages}}
+        <div class="error-suggestions">
+          <p>Or check out these pages:</p>
+          <ul>
+            {{range .Pages}}
+            <li><a href="/page/{{.Slug}}">{{.Title}}</a></li>
+            {{end}}
+          </ul>
+        </div>
+        {{end}}
       </div>
     </main>
 
