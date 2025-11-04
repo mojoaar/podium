@@ -5,6 +5,10 @@ import (
 	"fmt"
 	"html"
 	"html/template"
+	"image"
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -15,10 +19,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/disintegration/imaging"
 	"github.com/fsnotify/fsnotify"
 	"github.com/gin-gonic/gin"
 	"github.com/kardianos/service"
 	"github.com/russross/blackfriday/v2"
+	"github.com/tdewolff/minify/v2"
+	"github.com/tdewolff/minify/v2/css"
+	"github.com/tdewolff/minify/v2/js"
 	"gopkg.in/yaml.v3"
 )
 
@@ -146,6 +154,140 @@ func cacheMiddleware() gin.HandlerFunc {
 		
 		c.Next()
 	}
+}
+
+// minifyAsset minifies CSS and JS files on-the-fly
+func minifyAsset(filePath string) ([]byte, error) {
+	// Read the original file
+	content, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return nil, err
+	}
+	
+	// In dev mode, return unminified
+	if isDevMode {
+		return content, nil
+	}
+	
+	// Create minifier
+	m := minify.New()
+	m.AddFunc("text/css", css.Minify)
+	m.AddFunc("text/javascript", js.Minify)
+	m.AddFunc("application/javascript", js.Minify)
+	
+	// Determine content type based on extension
+	ext := filepath.Ext(filePath)
+	var contentType string
+	switch ext {
+	case ".css":
+		contentType = "text/css"
+	case ".js":
+		contentType = "application/javascript"
+	default:
+		// Don't minify other file types
+		return content, nil
+	}
+	
+	// Minify the content
+	minified, err := m.Bytes(contentType, content)
+	if err != nil {
+		// If minification fails, return original content
+		log.Printf("Warning: Failed to minify %s: %v", filePath, err)
+		return content, nil
+	}
+	
+	return minified, nil
+}
+
+// convertToWebP converts an image to WebP format
+func convertToWebP(sourcePath string) ([]byte, error) {
+	// Open the source image
+	img, err := imaging.Open(sourcePath)
+	if err != nil {
+		return nil, err
+	}
+	
+	// Create a buffer to write WebP data
+	// Note: imaging library doesn't support WebP encoding directly
+	// So we'll return the optimized version of the original format
+	// For true WebP support, you'd need to use a library like 'chai2010/webp'
+	
+	// For now, let's just optimize the image by resizing if it's too large
+	bounds := img.Bounds()
+	maxWidth := 1920
+	maxHeight := 1920
+	
+	if bounds.Dx() > maxWidth || bounds.Dy() > maxHeight {
+		img = imaging.Fit(img, maxWidth, maxHeight, imaging.Lanczos)
+	}
+	
+	// Encode back to original format with quality optimization
+	ext := strings.ToLower(filepath.Ext(sourcePath))
+	var buf []byte
+	
+	switch ext {
+	case ".jpg", ".jpeg":
+		// Save as JPEG with 85% quality
+		tmpFile, err := ioutil.TempFile("", "optimized-*.jpg")
+		if err != nil {
+			return nil, err
+		}
+		defer os.Remove(tmpFile.Name())
+		defer tmpFile.Close()
+		
+		if err := imaging.Save(img, tmpFile.Name(), imaging.JPEGQuality(85)); err != nil {
+			return nil, err
+		}
+		
+		buf, err = ioutil.ReadFile(tmpFile.Name())
+		if err != nil {
+			return nil, err
+		}
+		
+	case ".png":
+		tmpFile, err := ioutil.TempFile("", "optimized-*.png")
+		if err != nil {
+			return nil, err
+		}
+		defer os.Remove(tmpFile.Name())
+		defer tmpFile.Close()
+		
+		if err := imaging.Save(img, tmpFile.Name()); err != nil {
+			return nil, err
+		}
+		
+		buf, err = ioutil.ReadFile(tmpFile.Name())
+		if err != nil {
+			return nil, err
+		}
+		
+	default:
+		// For unsupported formats, return original
+		return ioutil.ReadFile(sourcePath)
+	}
+	
+	return buf, nil
+}
+
+// resizeImage resizes an image to specified dimensions
+func resizeImage(sourcePath string, width, height int) (image.Image, error) {
+	img, err := imaging.Open(sourcePath)
+	if err != nil {
+		return nil, err
+	}
+	
+	if width > 0 && height > 0 {
+		// Resize to exact dimensions
+		return imaging.Resize(img, width, height, imaging.Lanczos), nil
+	} else if width > 0 {
+		// Resize by width, maintain aspect ratio
+		return imaging.Resize(img, width, 0, imaging.Lanczos), nil
+	} else if height > 0 {
+		// Resize by height, maintain aspect ratio
+		return imaging.Resize(img, 0, height, imaging.Lanczos), nil
+	}
+	
+	return img, nil
 }
 
 func (p *program) Start(s service.Service) error {
@@ -426,8 +568,101 @@ func (p *program) run() {
 		c.String(http.StatusOK, string(content))
 	})
 
-	// Serve static assets (CSS, JS, images)
-	p.router.Static("/assets", "./assets")
+	// Serve static assets (CSS, JS, images) with minification for CSS/JS
+	p.router.GET("/assets/*filepath", func(c *gin.Context) {
+		reqPath := c.Param("filepath")
+		fullPath := filepath.Join("./assets", reqPath)
+		
+		// Check if file exists
+		if _, err := os.Stat(fullPath); os.IsNotExist(err) {
+			c.AbortWithStatus(http.StatusNotFound)
+			return
+		}
+		
+		// Get file extension
+		ext := filepath.Ext(fullPath)
+		
+		// For CSS and JS, serve minified version
+		if ext == ".css" || ext == ".js" {
+			minified, err := minifyAsset(fullPath)
+			if err != nil {
+				c.AbortWithStatus(http.StatusInternalServerError)
+				return
+			}
+			
+			// Set appropriate content type
+			if ext == ".css" {
+				c.Header("Content-Type", "text/css; charset=utf-8")
+			} else if ext == ".js" {
+				c.Header("Content-Type", "application/javascript; charset=utf-8")
+			}
+			
+			c.Data(http.StatusOK, c.GetHeader("Content-Type"), minified)
+			return
+		}
+		
+		// For images, check if optimization is requested
+		isImage := ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".gif"
+		if isImage {
+			// Check for resize parameters
+			widthStr := c.Query("w")
+			heightStr := c.Query("h")
+			optimize := c.Query("optimize") == "true"
+			
+			if widthStr != "" || heightStr != "" {
+				// Resize requested
+				width, _ := strconv.Atoi(widthStr)
+				height, _ := strconv.Atoi(heightStr)
+				
+				resized, err := resizeImage(fullPath, width, height)
+				if err != nil {
+					log.Printf("Error resizing image: %v", err)
+					c.File(fullPath)
+					return
+				}
+				
+				// Save to temp file and serve
+				tmpFile, err := ioutil.TempFile("", "resized-*"+ext)
+				if err != nil {
+					c.File(fullPath)
+					return
+				}
+				defer os.Remove(tmpFile.Name())
+				defer tmpFile.Close()
+				
+				if err := imaging.Save(resized, tmpFile.Name()); err != nil {
+					c.File(fullPath)
+					return
+				}
+				
+				c.File(tmpFile.Name())
+				return
+			} else if optimize && !isDevMode {
+				// Optimize image
+				optimized, err := convertToWebP(fullPath)
+				if err != nil {
+					log.Printf("Error optimizing image: %v", err)
+					c.File(fullPath)
+					return
+				}
+				
+				// Determine content type
+				contentType := "image/jpeg"
+				switch ext {
+				case ".png":
+					contentType = "image/png"
+				case ".gif":
+					contentType = "image/gif"
+				}
+				
+				c.Data(http.StatusOK, contentType, optimized)
+				return
+			}
+		}
+		
+		// For other files, serve normally
+		c.File(fullPath)
+	})
 
 	port := fmt.Sprintf(":%d", appConfig.Port)
 	log.Printf("Starting Podium server on %s", port)
@@ -814,6 +1049,7 @@ func generateSitemap(posts []PageLink, pages []PageLink) string {
 	// Add homepage
 	sitemap.WriteString("  <url>\n")
 	sitemap.WriteString(fmt.Sprintf("    <loc>%s</loc>\n", appConfig.SiteURL))
+	sitemap.WriteString(fmt.Sprintf("    <lastmod>%s</lastmod>\n", time.Now().Format("2006-01-02")))
 	sitemap.WriteString("    <changefreq>daily</changefreq>\n")
 	sitemap.WriteString("    <priority>1.0</priority>\n")
 	sitemap.WriteString("  </url>\n")
@@ -821,6 +1057,7 @@ func generateSitemap(posts []PageLink, pages []PageLink) string {
 	// Add posts list page
 	sitemap.WriteString("  <url>\n")
 	sitemap.WriteString(fmt.Sprintf("    <loc>%s/posts</loc>\n", appConfig.SiteURL))
+	sitemap.WriteString(fmt.Sprintf("    <lastmod>%s</lastmod>\n", time.Now().Format("2006-01-02")))
 	sitemap.WriteString("    <changefreq>daily</changefreq>\n")
 	sitemap.WriteString("    <priority>0.9</priority>\n")
 	sitemap.WriteString("  </url>\n")
@@ -833,7 +1070,11 @@ func generateSitemap(posts []PageLink, pages []PageLink) string {
 		if post.Date != "" {
 			if parsedDate, err := time.Parse("2006-01-02", post.Date); err == nil {
 				sitemap.WriteString(fmt.Sprintf("    <lastmod>%s</lastmod>\n", parsedDate.Format("2006-01-02")))
+			} else {
+				sitemap.WriteString(fmt.Sprintf("    <lastmod>%s</lastmod>\n", time.Now().Format("2006-01-02")))
 			}
+		} else {
+			sitemap.WriteString(fmt.Sprintf("    <lastmod>%s</lastmod>\n", time.Now().Format("2006-01-02")))
 		}
 		
 		sitemap.WriteString("    <changefreq>monthly</changefreq>\n")
@@ -845,10 +1086,19 @@ func generateSitemap(posts []PageLink, pages []PageLink) string {
 	for _, page := range pages {
 		sitemap.WriteString("  <url>\n")
 		sitemap.WriteString(fmt.Sprintf("    <loc>%s/page/%s</loc>\n", appConfig.SiteURL, page.Slug))
+		sitemap.WriteString(fmt.Sprintf("    <lastmod>%s</lastmod>\n", time.Now().Format("2006-01-02")))
 		sitemap.WriteString("    <changefreq>monthly</changefreq>\n")
 		sitemap.WriteString("    <priority>0.7</priority>\n")
 		sitemap.WriteString("  </url>\n")
 	}
+	
+	// Add RSS feed
+	sitemap.WriteString("  <url>\n")
+	sitemap.WriteString(fmt.Sprintf("    <loc>%s/feed.xml</loc>\n", appConfig.SiteURL))
+	sitemap.WriteString(fmt.Sprintf("    <lastmod>%s</lastmod>\n", time.Now().Format("2006-01-02")))
+	sitemap.WriteString("    <changefreq>daily</changefreq>\n")
+	sitemap.WriteString("    <priority>0.5</priority>\n")
+	sitemap.WriteString("  </url>\n")
 	
 	sitemap.WriteString("</urlset>\n")
 	return sitemap.String()

@@ -23,8 +23,9 @@ _Mobile-responsive design with touch-friendly navigation_
 - 📄 Create static pages in Markdown
 - 🔄 Automatic navigation generation - new static pages automatically appear in the menu
 - 🎨 Clean, responsive design with **dark/light theme toggle**
-- ⚡ Fast and lightweight with **HTTP caching** and **lazy-loaded images**
-- 🔧 **Cross-platform system service support** (Windows, macOS, Linux)
+- ⚡ Fast and lightweight with **HTTP caching**, **lazy-loaded images**, and **asset minification**
+- �️ **Image optimization** with automatic resizing and quality optimization
+- �🔧 **Cross-platform system service support** (Windows, macOS, Linux)
 - 🏷️ **Tags support** for blog posts with automatic filtering
 - 💻 **Syntax highlighting** for code blocks (140+ languages via highlight.js)
 - 📅 **Date timestamps** for blog posts with newest-first sorting
@@ -34,9 +35,10 @@ _Mobile-responsive design with touch-friendly navigation_
 - 📱 **Mobile-responsive design** with touch-friendly navigation
 - 🖨️ **Print-friendly CSS** for clean article printing
 - 📡 **RSS/Atom feed** for blog subscribers
-- 🗺️ **Sitemap.xml** for SEO
+- 🗺️ **Sitemap.xml** with automatic post/page indexing
 - 📄 **Pagination** for long post lists
 - 🔗 **Share buttons** for social media (Twitter, LinkedIn, Facebook, Reddit)
+- 📋 **Copy code button** for easy code snippet copying
 - ⚙️ **YAML configuration** for easy customization
 - 🔥 **Hot reload** in development mode for faster iteration
 
@@ -431,6 +433,8 @@ These are automatically included on all blog posts.
 - [Service](https://github.com/kardianos/service) - Cross-platform service management
 - [YAML](https://gopkg.in/yaml.v3) - YAML configuration parser
 - [fsnotify](https://github.com/fsnotify/fsnotify) v1.9.0 - File system notifications for hot reload
+- [tdewolff/minify](https://github.com/tdewolff/minify) v2 - CSS/JS minification
+- [imaging](https://github.com/disintegration/imaging) v1.6.2 - Image optimization and resizing
 - [Highlight.js](https://highlightjs.org/) v11.9.0 (CDN) - Syntax highlighting
 
 ## System Service Installation
@@ -620,6 +624,63 @@ The service is configured with the following settings:
 - Check system logs for error messages
 - Ensure all dependencies are present (templates, assets, etc.)
 - Verify the Go binary is compatible with your system architecture
+
+## Performance Optimizations
+
+Podium includes several performance optimizations to ensure fast page loads:
+
+### Asset Minification
+
+CSS and JavaScript files are automatically minified in production mode:
+
+- Reduces file sizes by 30-60%
+- Faster page load times
+- Automatic in production, disabled in dev mode for easier debugging
+
+### Image Optimization
+
+Images can be dynamically optimized and resized:
+
+```html
+<!-- Original image -->
+<img src="/assets/image.jpg" alt="Original" />
+
+<!-- Resized by width (maintains aspect ratio) -->
+<img src="/assets/image.jpg?w=800" alt="Resized" />
+
+<!-- Resized by width and height -->
+<img src="/assets/image.jpg?w=800&h=600" alt="Exact size" />
+
+<!-- Optimized quality (reduced file size) -->
+<img src="/assets/image.jpg?optimize=true" alt="Optimized" />
+```
+
+Features:
+
+- On-demand image resizing
+- Quality optimization for JPEG and PNG
+- Automatic max-width limiting (1920px)
+- Lazy loading enabled by default
+
+### HTTP Caching
+
+Smart caching headers are automatically set:
+
+- CSS/JS: 7 days
+- Images: 30 days
+- Fonts: 1 year
+- HTML: 5 minutes with revalidation
+- ETag support for 304 Not Modified responses
+
+### Sitemap Generation
+
+Podium automatically generates a sitemap at `/sitemap.xml` including:
+
+- Homepage and blog posts page
+- All published blog posts with lastmod dates
+- All static pages
+- RSS feed
+- Proper priority and changefreq values
 
 ## Development Mode
 

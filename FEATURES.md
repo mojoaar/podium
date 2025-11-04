@@ -257,6 +257,22 @@ assets_folder: "assets"
   - Deferred loading for off-screen images
   - Improved page load performance
   - Responsive image sizing with CSS
+- **Asset minification**
+  - Automatic CSS and JavaScript minification in production
+  - 30-60% file size reduction
+  - Disabled in dev mode for easier debugging
+  - On-the-fly minification using tdewolff/minify
+- **Image optimization**
+  - Dynamic image resizing via query parameters (`?w=800&h=600`)
+  - Quality optimization for JPEG and PNG images
+  - Automatic max-width limiting (1920px for large images)
+  - On-demand processing, no pre-generation needed
+- **Automatic sitemap generation**
+  - `/sitemap.xml` automatically generated
+  - Includes all posts with lastmod dates
+  - Includes all static pages
+  - Proper priority and changefreq values
+  - SEO-optimized for search engines
 
 ### 🔒 **Security**
 
@@ -351,13 +367,23 @@ Supported in all markdown files:
 
 ## SEO Features
 
-- Sitemap.xml for crawlers
-- RSS feed auto-discovery
-- Meta descriptions
+- **Automatic sitemap.xml generation**
+  - Dynamically generated at `/sitemap.xml`
+  - Includes all posts with publication dates as lastmod
+  - Includes all static pages
+  - Homepage, posts page, and RSS feed included
+  - Proper priority values (1.0 for homepage, 0.9 for posts page, 0.8 for individual posts)
+  - Change frequency hints for crawlers
+- **robots.txt** with sitemap reference
+- **humans.txt** for project credits
+- RSS/Atom feed with auto-discovery
+- Meta descriptions from site configuration
 - Semantic HTML structure
-- Clean URLs
+- Clean, readable URLs
 - Mobile-friendly design
-- Fast load times
+- Fast load times with optimization
+- Proper heading hierarchy
+- Image alt text support
 
 ## License
 
