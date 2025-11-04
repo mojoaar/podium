@@ -54,6 +54,8 @@ type Config struct {
 	SocialGitHub    string `yaml:"social_github"`
 	SocialReddit    string `yaml:"social_reddit"`
 	SocialFacebook  string `yaml:"social_facebook"`
+	UmamiScriptURL  string `yaml:"umami_script_url"`
+	UmamiWebsiteID  string `yaml:"umami_website_id"`
 }
 
 // Global config variable
@@ -88,6 +90,8 @@ type Page struct {
 	SocialGitHub     string
 	SocialReddit     string
 	SocialFacebook   string
+	UmamiScriptURL   string
+	UmamiWebsiteID   string
 }
 
 type PageLink struct {
@@ -124,6 +128,8 @@ type Post struct {
 	SocialGitHub     string
 	SocialReddit     string
 	SocialFacebook   string
+	UmamiScriptURL   string
+	UmamiWebsiteID   string
 }
 
 // program implements the service.Interface
@@ -365,6 +371,8 @@ func (p *program) run() {
 			"SocialGitHub":    appConfig.SocialGitHub,
 			"SocialReddit":    appConfig.SocialReddit,
 			"SocialFacebook":  appConfig.SocialFacebook,
+			"UmamiScriptURL":  appConfig.UmamiScriptURL,
+			"UmamiWebsiteID":  appConfig.UmamiWebsiteID,
 		})
 	})
 
@@ -387,6 +395,8 @@ func (p *program) run() {
 				"SocialGitHub":    appConfig.SocialGitHub,
 				"SocialReddit":    appConfig.SocialReddit,
 				"SocialFacebook":  appConfig.SocialFacebook,
+				"UmamiScriptURL":  appConfig.UmamiScriptURL,
+				"UmamiWebsiteID":  appConfig.UmamiWebsiteID,
 			})
 			return
 		}
@@ -407,6 +417,8 @@ func (p *program) run() {
 				"SocialGitHub":    appConfig.SocialGitHub,
 				"SocialReddit":    appConfig.SocialReddit,
 				"SocialFacebook":  appConfig.SocialFacebook,
+				"UmamiScriptURL":  appConfig.UmamiScriptURL,
+				"UmamiWebsiteID":  appConfig.UmamiWebsiteID,
 			})
 			return
 		}
@@ -429,6 +441,8 @@ func (p *program) run() {
 			SocialGitHub:    appConfig.SocialGitHub,
 			SocialReddit:    appConfig.SocialReddit,
 			SocialFacebook:  appConfig.SocialFacebook,
+			UmamiScriptURL:  appConfig.UmamiScriptURL,
+			UmamiWebsiteID:  appConfig.UmamiWebsiteID,
 		})
 	})
 
@@ -487,6 +501,8 @@ func (p *program) run() {
 			"SocialGitHub":    appConfig.SocialGitHub,
 			"SocialReddit":    appConfig.SocialReddit,
 			"SocialFacebook":  appConfig.SocialFacebook,
+			"UmamiScriptURL":  appConfig.UmamiScriptURL,
+			"UmamiWebsiteID":  appConfig.UmamiWebsiteID,
 		})
 	})
 
@@ -509,6 +525,8 @@ func (p *program) run() {
 				"SocialGitHub":    appConfig.SocialGitHub,
 				"SocialReddit":    appConfig.SocialReddit,
 				"SocialFacebook":  appConfig.SocialFacebook,
+				"UmamiScriptURL":  appConfig.UmamiScriptURL,
+				"UmamiWebsiteID":  appConfig.UmamiWebsiteID,
 			})
 			return
 		}
@@ -529,6 +547,8 @@ func (p *program) run() {
 				"SocialGitHub":    appConfig.SocialGitHub,
 				"SocialReddit":    appConfig.SocialReddit,
 				"SocialFacebook":  appConfig.SocialFacebook,
+				"UmamiScriptURL":  appConfig.UmamiScriptURL,
+				"UmamiWebsiteID":  appConfig.UmamiWebsiteID,
 			})
 			return
 		}
@@ -552,6 +572,8 @@ func (p *program) run() {
 					"SocialGitHub":    appConfig.SocialGitHub,
 					"SocialReddit":    appConfig.SocialReddit,
 					"SocialFacebook":  appConfig.SocialFacebook,
+					"UmamiScriptURL":  appConfig.UmamiScriptURL,
+					"UmamiWebsiteID":  appConfig.UmamiWebsiteID,
 				})
 				return
 			}
@@ -582,6 +604,8 @@ func (p *program) run() {
 			SocialGitHub:    appConfig.SocialGitHub,
 			SocialReddit:    appConfig.SocialReddit,
 			SocialFacebook:  appConfig.SocialFacebook,
+			UmamiScriptURL:  appConfig.UmamiScriptURL,
+			UmamiWebsiteID:  appConfig.UmamiWebsiteID,
 		})
 	})
 
@@ -652,6 +676,8 @@ func (p *program) run() {
 			"SocialGitHub":    appConfig.SocialGitHub,
 			"SocialReddit":    appConfig.SocialReddit,
 			"SocialFacebook":  appConfig.SocialFacebook,
+			"UmamiScriptURL":  appConfig.UmamiScriptURL,
+			"UmamiWebsiteID":  appConfig.UmamiWebsiteID,
 		})
 	})
 

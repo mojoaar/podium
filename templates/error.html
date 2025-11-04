@@ -13,6 +13,13 @@
       href="/feed.xml"
     />
     <link rel="stylesheet" href="/assets/style.css" />
+    {{if and .UmamiScriptURL .UmamiWebsiteID}}
+    <script
+      defer
+      src="{{.UmamiScriptURL}}"
+      data-website-id="{{.UmamiWebsiteID}}"
+    ></script>
+    {{end}}
   </head>
   <body>
     <header>

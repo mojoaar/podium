@@ -141,6 +141,10 @@ social_github: ""
 social_reddit: ""
 social_facebook: ""
 
+# Analytics
+umami_script_url: "" # e.g., "https://analytics.yourdomain.com/script.js"
+umami_website_id: "" # Your Umami website ID
+
 # Paths (relative to application root)
 posts_folder: "posts"
 static_folder: "static"
@@ -168,6 +172,8 @@ assets_folder: "assets"
 - `social_github` - GitHub profile URL (e.g., "https://github.com/yourusername")
 - `social_reddit` - Reddit profile URL (e.g., "https://reddit.com/user/yourusername")
 - `social_facebook` - Facebook profile URL (e.g., "https://facebook.com/yourusername")
+- `umami_script_url` - Umami analytics script URL (e.g., "https://analytics.yourdomain.com/script.js")
+- `umami_website_id` - Your Umami website ID for tracking
 - `posts_folder` - Directory containing blog posts (default: "posts")
 - `static_folder` - Directory containing static pages (default: "static")
 - `templates_folder` - Directory containing HTML templates (default: "templates")

@@ -30,6 +30,10 @@ social_github: "https://github.com/mojoaar"
 social_reddit: ""
 social_facebook: ""
 
+# Analytics
+umami_script_url: "" # e.g., "https://analytics.yourdomain.com/script.js"
+umami_website_id: "" # Your Umami website ID
+
 # Paths (relative to application root)
 posts_folder: "posts"
 static_folder: "static"

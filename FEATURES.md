@@ -155,7 +155,17 @@ Comprehensive list of all features in Podium.
 - Responsive design with proper spacing
 - Accessible with ARIA labels and titles
 
-### 📡 **RSS/Atom Feed**
+### � **Umami Analytics**
+
+- Privacy-focused, open-source analytics
+- Optional integration via configuration
+- Automatically injected when configured
+- Simply add `umami_script_url` and `umami_website_id` to config
+- Works across all pages (homepage, posts, pages, error)
+- No tracking if not configured
+- Supports self-hosted or cloud Umami instances
+
+### �📡 **RSS/Atom Feed**
 
 - Available at `/feed.xml`
 - Configurable item count (`feed_items: 20`)
@@ -233,6 +243,10 @@ social_github: ""
 social_reddit: ""
 social_facebook: ""
 
+# Analytics
+umami_script_url: "" # e.g., "https://analytics.yourdomain.com/script.js"
+umami_website_id: "" # Your Umami website ID
+
 # Paths
 posts_folder: "posts"
 static_folder: "static"
@@ -260,6 +274,8 @@ assets_folder: "assets"
 - `social_github` - GitHub profile URL
 - `social_reddit` - Reddit profile URL
 - `social_facebook` - Facebook profile URL
+- `umami_script_url` - Umami analytics script URL (optional)
+- `umami_website_id` - Your Umami website ID for tracking (optional)
 - Folder paths for content, templates, and assets
 
 ### 🔧 **Fallback Defaults**
