@@ -1,0 +1,8 @@
+# robots.txt for Podium
+# https://www.robotstxt.org/
+
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: /sitemap.xml

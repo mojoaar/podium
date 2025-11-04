@@ -372,6 +372,47 @@ main {
   border-radius: 5px;
 }
 
+/* Code block wrapper for copy button */
+.code-block-wrapper {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.copy-code-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  z-index: 10;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.copy-code-btn:hover {
+  background: var(--accent-primary);
+  color: white;
+  border-color: var(--accent-primary);
+}
+
+.copy-code-btn.copied {
+  background: #27ae60;
+  border-color: #27ae60;
+  color: white;
+}
+
+.copy-code-btn svg {
+  flex-shrink: 0;
+}
+
 .post-content ul,
 .page-content ul,
 .post-content ol,

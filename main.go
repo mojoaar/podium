@@ -408,6 +408,24 @@ func (p *program) run() {
 		c.String(http.StatusOK, generateSitemap(posts, pages))
 	})
 
+	// Serve robots.txt
+	p.router.GET("/robots.txt", func(c *gin.Context) {
+		c.Header("Content-Type", "text/plain; charset=utf-8")
+		content := fmt.Sprintf("# robots.txt for Podium\n# https://www.robotstxt.org/\n\nUser-agent: *\nAllow: /\n\n# Sitemaps\nSitemap: %s/sitemap.xml\n", appConfig.SiteURL)
+		c.String(http.StatusOK, content)
+	})
+
+	// Serve humans.txt
+	p.router.GET("/humans.txt", func(c *gin.Context) {
+		content, err := ioutil.ReadFile("humans.txt")
+		if err != nil {
+			c.String(http.StatusNotFound, "humans.txt not found")
+			return
+		}
+		c.Header("Content-Type", "text/plain; charset=utf-8")
+		c.String(http.StatusOK, string(content))
+	})
+
 	// Serve static assets (CSS, JS, images)
 	p.router.Static("/assets", "./assets")
 

@@ -1,0 +1,43 @@
+/* TEAM */
+
+Author: Morten Johansen
+Site: https://github.com/mojoaar/podium
+Location: Denmark
+
+/* THANKS */
+
+Go Language Team
+Gin Framework Contributors
+Blackfriday Markdown Parser Team
+highlight.js Team
+All Open Source Contributors
+
+/* SITE */
+
+Language: English
+Standards: HTML5, CSS3, ES6
+Components: Go, Gin, Blackfriday, highlight.js
+Software: VS Code, Git
+
+/* TECHNOLOGY */
+
+Backend: Go 1.21+
+Framework: Gin v1.11.0
+Markdown: Blackfriday v2.1.0
+Syntax Highlighting: highlight.js v11.9.0
+Service Manager: kardianos/service
+File Watcher: fsnotify v1.9.0
+Config: YAML v3
+
+/* FEATURES */
+
+- Markdown-based blogging
+- Dark/Light theme toggle
+- RSS/Atom feed
+- Tags and pagination
+- Syntax highlighting
+- Mobile responsive design
+- Hot reload in dev mode
+- HTTP caching with ETags
+- Lazy-loaded images
+- Cross-platform service support
