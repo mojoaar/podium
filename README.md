@@ -41,6 +41,8 @@ _Mobile-responsive design with touch-friendly navigation_
 - 📄 **Pagination** for long post lists
 - 🔗 **Share buttons** for social media (Twitter, LinkedIn, Facebook, Reddit)
 - 📋 **Copy code button** for easy code snippet copying
+- 🌐 **Social media icons** in footer (Twitter, Bluesky, LinkedIn, GitHub, Reddit, Facebook)
+- 📊 **Umami analytics** support for privacy-focused website tracking
 - ⚙️ **YAML configuration** for easy customization
 - 🔥 **Config hot reload** - Configuration changes apply instantly without restart
 - 🔄 **Hot reload** in development mode for faster iteration
