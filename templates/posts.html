@@ -105,19 +105,19 @@
 
     <footer>
       <p>
-        &copy; {{.CurrentYear}}
+        &copy; {{.CurrentYear}}{{if .SiteAuthor}} {{if .SiteAuthorURL}}<a
+          href="{{.SiteAuthorURL}}"
+          target="_blank"
+          rel="noopener"
+          >{{.SiteAuthor}}</a
+        >{{else}}{{.SiteAuthor}}{{end}}{{end}}.
         <a
           href="https://github.com/mojoaar/podium"
           target="_blank"
           rel="noopener"
           title="Rocking on Podium!"
           >Podium</a
-        >{{if .SiteAuthor}} by {{if .SiteAuthorURL}}<a
-          href="{{.SiteAuthorURL}}"
-          target="_blank"
-          rel="noopener"
-          >{{.SiteAuthor}}</a
-        >{{else}}{{.SiteAuthor}}{{end}}{{end}}. Built with Go and Gin ♥
+        >, built with Go and Gin ♥
       </p>
       {{if .ShowSocialLinks}}
       <div class="social-links">
