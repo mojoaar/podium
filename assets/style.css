@@ -634,6 +634,37 @@ footer a:hover {
   text-decoration: underline;
 }
 
+/* Social Links */
+.social-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.social-links a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  color: var(--text-secondary);
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.social-links a:hover {
+  color: var(--accent-primary);
+  transform: translateY(-2px);
+  text-decoration: none;
+}
+
+.social-links svg {
+  width: 24px;
+  height: 24px;
+}
+
 /* Tags */
 .post-tags {
   margin-top: 2rem;

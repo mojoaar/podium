@@ -144,6 +144,17 @@ Comprehensive list of all features in Podium.
 - Touch-friendly buttons
 - Hidden when printing
 
+### 🌐 **Social Media Icons**
+
+- Configurable social media links in footer
+- Support for Twitter, Bluesky, LinkedIn, GitHub, Reddit, Facebook
+- SVG icons with hover effects
+- Only displays icons for configured platforms
+- Toggle visibility with `show_social_links` config
+- Appears on all pages (homepage, posts, pages, error)
+- Responsive design with proper spacing
+- Accessible with ARIA labels and titles
+
 ### 📡 **RSS/Atom Feed**
 
 - Available at `/feed.xml`
@@ -212,6 +223,15 @@ feed_items: 20
 # Excerpts
 excerpt_length: 200
 
+# Social Media Links
+show_social_links: true
+social_twitter: ""
+social_bluesky: ""
+social_linkedin: ""
+social_github: ""
+social_reddit: ""
+social_facebook: ""
+
 # Paths
 posts_folder: "posts"
 static_folder: "static"
@@ -231,6 +251,13 @@ assets_folder: "assets"
 - `posts_per_page` - Posts per page (default: 10)
 - `feed_items` - RSS feed items (default: 20)
 - `excerpt_length` - Excerpt character limit (default: 200)
+- `show_social_links` - Toggle social media icons in footer (true/false, default: false)
+- `social_twitter` - Twitter/X profile URL
+- `social_bluesky` - Bluesky profile URL
+- `social_linkedin` - LinkedIn profile URL
+- `social_github` - GitHub profile URL
+- `social_reddit` - Reddit profile URL
+- `social_facebook` - Facebook profile URL
 - Folder paths for content, templates, and assets
 
 ### 🔧 **Fallback Defaults**
@@ -238,6 +265,15 @@ assets_folder: "assets"
 - Works without config.yaml
 - Sensible defaults for all settings
 - Easy to customize
+
+### 🔥 **Config Hot Reload**
+
+- Automatic config reload on file changes
+- Works in both development and production modes
+- No server restart required
+- ~500ms reload delay (debounced)
+- Perfect for updating social links, site settings, etc.
+- Works even when running as a system service
 
 ## System Integration
 
@@ -348,6 +384,11 @@ assets_folder: "assets"
   - Watches posts, static, templates, assets directories
   - 500ms debounce to prevent multiple reloads
   - Debug mode logging for troubleshooting
+- **Config hot reload in production**
+  - Watches config.yaml even in production mode
+  - Configuration changes apply instantly
+  - No server restart needed
+  - Ideal for updating social links, site settings, etc.
 - Live reload friendly
 - Clear error messages
 - Comprehensive logging

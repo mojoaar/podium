@@ -42,7 +42,8 @@ _Mobile-responsive design with touch-friendly navigation_
 - 🔗 **Share buttons** for social media (Twitter, LinkedIn, Facebook, Reddit)
 - 📋 **Copy code button** for easy code snippet copying
 - ⚙️ **YAML configuration** for easy customization
-- 🔥 **Hot reload** in development mode for faster iteration
+- 🔥 **Config hot reload** - Configuration changes apply instantly without restart
+- 🔄 **Hot reload** in development mode for faster iteration
 
 ## Project Structure
 
@@ -130,6 +131,15 @@ feed_items: 20
 # Excerpts
 excerpt_length: 200
 
+# Social Media Links
+show_social_links: true
+social_twitter: ""
+social_bluesky: ""
+social_linkedin: ""
+social_github: ""
+social_reddit: ""
+social_facebook: ""
+
 # Paths (relative to application root)
 posts_folder: "posts"
 static_folder: "static"
@@ -149,12 +159,19 @@ assets_folder: "assets"
 - `posts_per_page` - Number of posts to show per page (default: 10)
 - `feed_items` - Number of items to include in RSS feed (default: 20)
 - `excerpt_length` - Maximum characters for post excerpts (default: 200)
+- `show_social_links` - Toggle social media icons in footer (true/false, default: false)
+- `social_twitter` - Twitter/X profile URL (e.g., "https://twitter.com/yourusername")
+- `social_bluesky` - Bluesky profile URL (e.g., "https://bsky.app/profile/yourusername")
+- `social_linkedin` - LinkedIn profile URL (e.g., "https://linkedin.com/in/yourusername")
+- `social_github` - GitHub profile URL (e.g., "https://github.com/yourusername")
+- `social_reddit` - Reddit profile URL (e.g., "https://reddit.com/user/yourusername")
+- `social_facebook` - Facebook profile URL (e.g., "https://facebook.com/yourusername")
 - `posts_folder` - Directory containing blog posts (default: "posts")
 - `static_folder` - Directory containing static pages (default: "static")
 - `templates_folder` - Directory containing HTML templates (default: "templates")
 - `assets_folder` - Directory containing CSS/images/etc (default: "assets")
 
-**Note:** If `config.yaml` is not found, Podium will use default values.
+**Note:** If `config.yaml` is not found, Podium will use default values. Only social media icons with configured URLs will be displayed.
 
 ### Running the Application
 
@@ -175,6 +192,10 @@ The application will start on `http://localhost:8080`
 - **Hot reload** - Automatically reloads templates and config when files change
 - **Debug logging** - More verbose output for troubleshooting
 - **No caching** - Fresh content on every request for easier development
+
+**Configuration Hot Reload:**
+
+In both development and production modes, Podium watches `config.yaml` for changes. When you update the configuration file (e.g., add a new social media link, change site title, etc.), the changes are automatically applied within ~500ms without requiring a server restart. This works even when running as a system service!
 
 ## Running Podium
 

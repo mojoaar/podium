@@ -46,6 +46,13 @@ type Config struct {
 	PostsPerPage    int    `yaml:"posts_per_page"`
 	FeedItems       int    `yaml:"feed_items"`
 	ExcerptLength   int    `yaml:"excerpt_length"`
+	ShowSocialLinks bool   `yaml:"show_social_links"`
+	SocialTwitter   string `yaml:"social_twitter"`
+	SocialBluesky   string `yaml:"social_bluesky"`
+	SocialLinkedIn  string `yaml:"social_linkedin"`
+	SocialGitHub    string `yaml:"social_github"`
+	SocialReddit    string `yaml:"social_reddit"`
+	SocialFacebook  string `yaml:"social_facebook"`
 }
 
 // Global config variable
@@ -64,14 +71,21 @@ func loadConfig(path string) (Config, error) {
 }
 
 type Page struct {
-	Title       string
-	Content     template.HTML
-	Pages       []PageLink
-	SiteTitle   string
-	SiteDesc    string
-	SiteAuthor  string
-	IsDraft     bool
-	CurrentYear string
+	Title            string
+	Content          template.HTML
+	Pages            []PageLink
+	SiteTitle        string
+	SiteDesc         string
+	SiteAuthor       string
+	IsDraft          bool
+	CurrentYear      string
+	ShowSocialLinks  bool
+	SocialTwitter    string
+	SocialBluesky    string
+	SocialLinkedIn   string
+	SocialGitHub     string
+	SocialReddit     string
+	SocialFacebook   string
 }
 
 type PageLink struct {
@@ -86,20 +100,27 @@ type PageLink struct {
 }
 
 type Post struct {
-	Title       string
-	Slug        string
-	Content     template.HTML
-	Pages       []PageLink
-	Tags        []string
-	SiteTitle   string
-	SiteDesc    string
-	SiteAuthor  string
-	Date        string
-	PublishDate string
-	IsDraft     bool
-	ReadingTime string
-	CurrentYear string
-	Featured    bool
+	Title            string
+	Slug             string
+	Content          template.HTML
+	Pages            []PageLink
+	Tags             []string
+	SiteTitle        string
+	SiteDesc         string
+	SiteAuthor       string
+	Date             string
+	PublishDate      string
+	IsDraft          bool
+	ReadingTime      string
+	CurrentYear      string
+	Featured         bool
+	ShowSocialLinks  bool
+	SocialTwitter    string
+	SocialBluesky    string
+	SocialLinkedIn   string
+	SocialGitHub     string
+	SocialReddit     string
+	SocialFacebook   string
 }
 
 // program implements the service.Interface
@@ -297,6 +318,12 @@ func resizeImage(sourcePath string, width, height int) (image.Image, error) {
 func (p *program) Start(s service.Service) error {
 	log.Println("Podium service starting...")
 	go p.run()
+	
+	// Start config file watcher in production mode
+	if !isDevMode {
+		go p.watchConfigFile()
+	}
+	
 	return nil
 }
 
@@ -327,6 +354,13 @@ func (p *program) run() {
 			"HomeIntro":      appConfig.HomeIntro,
 			"ShowQuickLinks": appConfig.ShowQuickLinks,
 			"CurrentYear":    getCurrentYear(),
+			"ShowSocialLinks": appConfig.ShowSocialLinks,
+			"SocialTwitter":   appConfig.SocialTwitter,
+			"SocialBluesky":   appConfig.SocialBluesky,
+			"SocialLinkedIn":  appConfig.SocialLinkedIn,
+			"SocialGitHub":    appConfig.SocialGitHub,
+			"SocialReddit":    appConfig.SocialReddit,
+			"SocialFacebook":  appConfig.SocialFacebook,
 		})
 	})
 
@@ -336,10 +370,17 @@ func (p *program) run() {
 		content, title, _, _, _, isDraft, _, _, err := loadMarkdownFile("static", slug)
 		if err != nil {
 			c.HTML(http.StatusNotFound, "error.html", gin.H{
-				"Error":       "Page not found",
-				"Pages":       getStaticPages(),
-				"SiteTitle":   appConfig.SiteTitle,
-				"CurrentYear": getCurrentYear(),
+				"Error":           "Page not found",
+				"Pages":           getStaticPages(),
+				"SiteTitle":       appConfig.SiteTitle,
+				"CurrentYear":     getCurrentYear(),
+				"ShowSocialLinks": appConfig.ShowSocialLinks,
+				"SocialTwitter":   appConfig.SocialTwitter,
+				"SocialBluesky":   appConfig.SocialBluesky,
+				"SocialLinkedIn":  appConfig.SocialLinkedIn,
+				"SocialGitHub":    appConfig.SocialGitHub,
+				"SocialReddit":    appConfig.SocialReddit,
+				"SocialFacebook":  appConfig.SocialFacebook,
 			})
 			return
 		}
@@ -347,24 +388,38 @@ func (p *program) run() {
 		// Don't show draft pages
 		if isDraft {
 			c.HTML(http.StatusNotFound, "error.html", gin.H{
-				"Error":       "Page not found",
-				"Pages":       getStaticPages(),
-				"SiteTitle":   appConfig.SiteTitle,
-				"CurrentYear": getCurrentYear(),
+				"Error":           "Page not found",
+				"Pages":           getStaticPages(),
+				"SiteTitle":       appConfig.SiteTitle,
+				"CurrentYear":     getCurrentYear(),
+				"ShowSocialLinks": appConfig.ShowSocialLinks,
+				"SocialTwitter":   appConfig.SocialTwitter,
+				"SocialBluesky":   appConfig.SocialBluesky,
+				"SocialLinkedIn":  appConfig.SocialLinkedIn,
+				"SocialGitHub":    appConfig.SocialGitHub,
+				"SocialReddit":    appConfig.SocialReddit,
+				"SocialFacebook":  appConfig.SocialFacebook,
 			})
 			return
 		}
 
 		pages := getStaticPages()
 		c.HTML(http.StatusOK, "page.html", Page{
-			Title:       title,
-			Content:     template.HTML(content),
-			Pages:       pages,
-			SiteTitle:   appConfig.SiteTitle,
-			SiteDesc:    appConfig.SiteDescription,
-			SiteAuthor:  appConfig.SiteAuthor,
-			IsDraft:     isDraft,
-			CurrentYear: getCurrentYear(),
+			Title:           title,
+			Content:         template.HTML(content),
+			Pages:           pages,
+			SiteTitle:       appConfig.SiteTitle,
+			SiteDesc:        appConfig.SiteDescription,
+			SiteAuthor:      appConfig.SiteAuthor,
+			IsDraft:         isDraft,
+			CurrentYear:     getCurrentYear(),
+			ShowSocialLinks: appConfig.ShowSocialLinks,
+			SocialTwitter:   appConfig.SocialTwitter,
+			SocialBluesky:   appConfig.SocialBluesky,
+			SocialLinkedIn:  appConfig.SocialLinkedIn,
+			SocialGitHub:    appConfig.SocialGitHub,
+			SocialReddit:    appConfig.SocialReddit,
+			SocialFacebook:  appConfig.SocialFacebook,
 		})
 	})
 
@@ -404,17 +459,24 @@ func (p *program) run() {
 		}
 		
 		c.HTML(http.StatusOK, "posts.html", gin.H{
-			"Posts":       paginatedPosts,
-			"Pages":       pages,
-			"SiteTitle":   appConfig.SiteTitle,
-			"SiteAuthor":  appConfig.SiteAuthor,
-			"CurrentPage": page,
-			"TotalPages":  totalPages,
-			"HasPrev":     page > 1,
-			"HasNext":     page < totalPages,
-			"PrevPage":    page - 1,
-			"NextPage":    page + 1,
-			"CurrentYear": getCurrentYear(),
+			"Posts":           paginatedPosts,
+			"Pages":           pages,
+			"SiteTitle":       appConfig.SiteTitle,
+			"SiteAuthor":      appConfig.SiteAuthor,
+			"CurrentPage":     page,
+			"TotalPages":      totalPages,
+			"HasPrev":         page > 1,
+			"HasNext":         page < totalPages,
+			"PrevPage":        page - 1,
+			"NextPage":        page + 1,
+			"CurrentYear":     getCurrentYear(),
+			"ShowSocialLinks": appConfig.ShowSocialLinks,
+			"SocialTwitter":   appConfig.SocialTwitter,
+			"SocialBluesky":   appConfig.SocialBluesky,
+			"SocialLinkedIn":  appConfig.SocialLinkedIn,
+			"SocialGitHub":    appConfig.SocialGitHub,
+			"SocialReddit":    appConfig.SocialReddit,
+			"SocialFacebook":  appConfig.SocialFacebook,
 		})
 	})
 
@@ -424,10 +486,17 @@ func (p *program) run() {
 		content, title, tags, date, publishDate, isDraft, isFeatured, plainText, err := loadMarkdownFile("posts", slug)
 		if err != nil {
 			c.HTML(http.StatusNotFound, "error.html", gin.H{
-				"Error":       "Post not found",
-				"Pages":       getStaticPages(),
-				"SiteTitle":   appConfig.SiteTitle,
-				"CurrentYear": getCurrentYear(),
+				"Error":           "Post not found",
+				"Pages":           getStaticPages(),
+				"SiteTitle":       appConfig.SiteTitle,
+				"CurrentYear":     getCurrentYear(),
+				"ShowSocialLinks": appConfig.ShowSocialLinks,
+				"SocialTwitter":   appConfig.SocialTwitter,
+				"SocialBluesky":   appConfig.SocialBluesky,
+				"SocialLinkedIn":  appConfig.SocialLinkedIn,
+				"SocialGitHub":    appConfig.SocialGitHub,
+				"SocialReddit":    appConfig.SocialReddit,
+				"SocialFacebook":  appConfig.SocialFacebook,
 			})
 			return
 		}
@@ -435,10 +504,17 @@ func (p *program) run() {
 		// Don't show draft posts
 		if isDraft {
 			c.HTML(http.StatusNotFound, "error.html", gin.H{
-				"Error":       "Post not found",
-				"Pages":       getStaticPages(),
-				"SiteTitle":   appConfig.SiteTitle,
-				"CurrentYear": getCurrentYear(),
+				"Error":           "Post not found",
+				"Pages":           getStaticPages(),
+				"SiteTitle":       appConfig.SiteTitle,
+				"CurrentYear":     getCurrentYear(),
+				"ShowSocialLinks": appConfig.ShowSocialLinks,
+				"SocialTwitter":   appConfig.SocialTwitter,
+				"SocialBluesky":   appConfig.SocialBluesky,
+				"SocialLinkedIn":  appConfig.SocialLinkedIn,
+				"SocialGitHub":    appConfig.SocialGitHub,
+				"SocialReddit":    appConfig.SocialReddit,
+				"SocialFacebook":  appConfig.SocialFacebook,
 			})
 			return
 		}
@@ -449,10 +525,17 @@ func (p *program) run() {
 			if err == nil && time.Now().Before(pubTime) {
 				// Post is scheduled for the future, don't show it yet
 				c.HTML(http.StatusNotFound, "error.html", gin.H{
-					"Error":       "Post not found",
-					"Pages":       getStaticPages(),
-					"SiteTitle":   appConfig.SiteTitle,
-					"CurrentYear": getCurrentYear(),
+					"Error":           "Post not found",
+					"Pages":           getStaticPages(),
+					"SiteTitle":       appConfig.SiteTitle,
+					"CurrentYear":     getCurrentYear(),
+					"ShowSocialLinks": appConfig.ShowSocialLinks,
+					"SocialTwitter":   appConfig.SocialTwitter,
+					"SocialBluesky":   appConfig.SocialBluesky,
+					"SocialLinkedIn":  appConfig.SocialLinkedIn,
+					"SocialGitHub":    appConfig.SocialGitHub,
+					"SocialReddit":    appConfig.SocialReddit,
+					"SocialFacebook":  appConfig.SocialFacebook,
 				})
 				return
 			}
@@ -461,20 +544,27 @@ func (p *program) run() {
 		pages := getStaticPages()
 		readingTime := calculateReadingTime(plainText)
 		c.HTML(http.StatusOK, "post.html", Post{
-			Title:       title,
-			Slug:        slug,
-			Content:     template.HTML(content),
-			Pages:       pages,
-			Tags:        tags,
-			SiteTitle:   appConfig.SiteTitle,
-			SiteDesc:    appConfig.SiteDescription,
-			SiteAuthor:  appConfig.SiteAuthor,
-			Date:        date,
-			PublishDate: publishDate,
-			IsDraft:     isDraft,
-			ReadingTime: readingTime,
-			CurrentYear: getCurrentYear(),
-			Featured:    isFeatured,
+			Title:           title,
+			Slug:            slug,
+			Content:         template.HTML(content),
+			Pages:           pages,
+			Tags:            tags,
+			SiteTitle:       appConfig.SiteTitle,
+			SiteDesc:        appConfig.SiteDescription,
+			SiteAuthor:      appConfig.SiteAuthor,
+			Date:            date,
+			PublishDate:     publishDate,
+			IsDraft:         isDraft,
+			ReadingTime:     readingTime,
+			CurrentYear:     getCurrentYear(),
+			Featured:        isFeatured,
+			ShowSocialLinks: appConfig.ShowSocialLinks,
+			SocialTwitter:   appConfig.SocialTwitter,
+			SocialBluesky:   appConfig.SocialBluesky,
+			SocialLinkedIn:  appConfig.SocialLinkedIn,
+			SocialGitHub:    appConfig.SocialGitHub,
+			SocialReddit:    appConfig.SocialReddit,
+			SocialFacebook:  appConfig.SocialFacebook,
 		})
 	})
 
@@ -525,18 +615,25 @@ func (p *program) run() {
 		
 		pages := getStaticPages()
 		c.HTML(http.StatusOK, "posts.html", gin.H{
-			"Posts":       paginatedPosts,
-			"Pages":       pages,
-			"Tag":         tag,
-			"SiteTitle":   appConfig.SiteTitle,
-			"SiteAuthor":  appConfig.SiteAuthor,
-			"CurrentPage": page,
-			"TotalPages":  totalPages,
-			"HasPrev":     page > 1,
-			"HasNext":     page < totalPages,
-			"PrevPage":    page - 1,
-			"NextPage":    page + 1,
-			"CurrentYear": getCurrentYear(),
+			"Posts":           paginatedPosts,
+			"Pages":           pages,
+			"Tag":             tag,
+			"SiteTitle":       appConfig.SiteTitle,
+			"SiteAuthor":      appConfig.SiteAuthor,
+			"CurrentPage":     page,
+			"TotalPages":      totalPages,
+			"HasPrev":         page > 1,
+			"HasNext":         page < totalPages,
+			"PrevPage":        page - 1,
+			"NextPage":        page + 1,
+			"CurrentYear":     getCurrentYear(),
+			"ShowSocialLinks": appConfig.ShowSocialLinks,
+			"SocialTwitter":   appConfig.SocialTwitter,
+			"SocialBluesky":   appConfig.SocialBluesky,
+			"SocialLinkedIn":  appConfig.SocialLinkedIn,
+			"SocialGitHub":    appConfig.SocialGitHub,
+			"SocialReddit":    appConfig.SocialReddit,
+			"SocialFacebook":  appConfig.SocialFacebook,
 		})
 	})
 
@@ -696,6 +793,64 @@ func (p *program) Stop(s service.Service) error {
 	log.Println("Podium service stopping...")
 	close(p.exit)
 	return nil
+}
+
+// watchConfigFile watches config.yaml for changes in production mode
+func (p *program) watchConfigFile() {
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		log.Printf("Warning: Failed to create config file watcher: %v", err)
+		return
+	}
+	defer watcher.Close()
+
+	// Watch config.yaml
+	configFile := "config.yaml"
+	if err := watcher.Add(configFile); err != nil {
+		log.Printf("Warning: Failed to watch config file: %v", err)
+		return
+	}
+	
+	log.Printf("Watching config file: %s (hot reload enabled)", configFile)
+
+	// Debounce timer to avoid multiple rapid reloads
+	debounceTimer := time.NewTimer(0)
+	<-debounceTimer.C // Drain the timer
+
+	for {
+		select {
+		case <-p.exit:
+			// Stop watching when service is stopping
+			return
+		case event, ok := <-watcher.Events:
+			if !ok {
+				return
+			}
+			// Only react to write events
+			if event.Op&fsnotify.Write == fsnotify.Write {
+				// Debounce: wait 500ms before reloading
+				debounceTimer.Reset(500 * time.Millisecond)
+				go func() {
+					<-debounceTimer.C
+					log.Printf("Config file changed - reloading...")
+					
+					// Reload config
+					config, err := loadConfig(configFile)
+					if err != nil {
+						log.Printf("Error: Failed to reload config: %v", err)
+					} else {
+						appConfig = config
+						log.Println("✓ Config reloaded successfully")
+					}
+				}()
+			}
+		case err, ok := <-watcher.Errors:
+			if !ok {
+				return
+			}
+			log.Printf("Config watcher error: %v", err)
+		}
+	}
 }
 
 func main() {

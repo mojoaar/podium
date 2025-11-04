@@ -20,6 +20,15 @@ feed_items: 20
 # Excerpts
 excerpt_length: 200
 
+# Social Media Links
+show_social_links: true
+social_twitter: ""
+social_bluesky: "https://bsky.app/profile/johansen.foo"
+social_linkedin: "https://www.linkedin.com/in/mojoaar/"
+social_github: "https://github.com/mojoaar"
+social_reddit: ""
+social_facebook: ""
+
 # Paths (relative to application root)
 posts_folder: "posts"
 static_folder: "static"
